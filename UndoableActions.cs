@@ -31,6 +31,10 @@ namespace HexcellsHelper
                 // Undo score.CorrectTileFound()
                 score.numberOfCorrectTilesFound--;
                 score.GetComponent<TextMesh>().text = (score.numberOfBlueTiles - score.numberOfCorrectTilesFound).ToString();
+
+                // Update the hex number text
+                var displayModeManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<DisplayModeManager>();
+                displayModeManager.UpdateHexNumbers();
             }
 
             // UX feedback

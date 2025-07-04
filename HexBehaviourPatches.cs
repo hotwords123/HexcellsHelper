@@ -23,6 +23,9 @@ namespace HexcellsHelper
 
             var undoManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<UndoManager>();
             undoManager.AddAction(new ClickUndoAction(__instance));
+
+            var displayModeManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<DisplayModeManager>();
+            displayModeManager.UpdateHexNumbers();
         }
     }
 }

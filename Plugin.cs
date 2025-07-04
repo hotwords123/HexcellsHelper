@@ -15,6 +15,9 @@ namespace HexcellsHelper
             BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<UndoManager>();
             Logger.LogInfo("UndoManager component added to GameManager.");
 
+            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<DisplayModeManager>();
+            Logger.LogInfo("DisplayModeManager component added to GameManager.");
+
             HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
 
