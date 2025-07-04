@@ -9,18 +9,14 @@ namespace HexcellsHelper
         private void Awake()
         {
             // Plugin startup logic
-            var gameManager = FindObjectOfType<GameManagerScript>();
-            if (gameManager == null)
-            {
-                Logger.LogError("GameManagerScript not found! Plugin cannot function properly.");
-                return;
-            }
+            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<LevelDumper>();
+            Logger.LogInfo("LevelDumper component added to GameManager.");
 
-            if (gameManager.GetComponent<LevelDumper>() == null)
-            {
-                gameManager.gameObject.AddComponent<LevelDumper>();
-                Logger.LogInfo("LevelDumper component added to GameManager.");
-            }
+            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<UndoManager>();
+            Logger.LogInfo("UndoManager component added to GameManager.");
+
+            HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
+            harmony.PatchAll();
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
