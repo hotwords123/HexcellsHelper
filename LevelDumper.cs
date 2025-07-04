@@ -14,17 +14,19 @@ namespace HexcellsHelper
         {
             if (Input.GetKeyDown(KeyCode.F2))
             {
-                string path = Path.Combine(
-                    Application.persistentDataPath,
-                    $"dump_{System.DateTime.Now:yyyyMMdd_HHmmss}.hexcells");
-
                 string levelText = SerializeCurrentLevel();
-
-                File.WriteAllText(path, levelText);
-                Debug.Log($"[LevelDumper] Level text saved to: {path}");
+                if (string.IsNullOrEmpty(levelText))
+                {
+                    Debug.LogError("[LevelDumper] Failed to serialize the current level.");
+                    GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>().PlayWrongNote(0.0f);
+                    return;
+                }
 
                 GUIUtility.systemCopyBuffer = levelText;
                 Debug.Log($"[LevelDumper] Level text copied to clipboard");
+
+                // Play a sound to indicate success
+                GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>().PlayNoteB(0.0f);
             }
         }
 
@@ -35,13 +37,21 @@ namespace HexcellsHelper
 
         string SerializeCurrentLevel()
         {
+            var hexGrid = GameObject.Find("Hex Grid");
+            var hexGridOverlay = GameObject.Find("Hex Grid Overlay");
+            if (hexGrid == null || hexGridOverlay == null)
+            {
+                Debug.LogError("[LevelDumper] Hex Grid or Hex Grid Overlay not found!");
+                return null;
+            }
+
             char[,] grid = new char[H, W * 2];
             for (int y = 0; y < H; y++)
                 for (int x = 0; x < W * 2; x++)
                     grid[y, x] = '.';
 
             bool[,] hiddenHexes = new bool[H, W];
-            foreach (Transform tr in GameObject.Find("Hex Grid Overlay").transform)
+            foreach (Transform tr in hexGridOverlay.transform)
             {
                 int xi = Mathf.RoundToInt(tr.position.x / 0.88f) + 15;
                 int yi = Mathf.RoundToInt(tr.position.y / 0.5f) + 15;
@@ -49,7 +59,7 @@ namespace HexcellsHelper
                 hiddenHexes[yi, xi] = true;
             }
 
-            foreach (Transform tr in GameObject.Find("Hex Grid").transform)
+            foreach (Transform tr in hexGrid.transform)
             {
                 int xi = Mathf.RoundToInt(tr.position.x / 0.88f) + 15;
                 int yi = Mathf.RoundToInt(tr.position.y / 0.5f) + 15;
