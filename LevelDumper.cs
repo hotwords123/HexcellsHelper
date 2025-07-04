@@ -63,26 +63,22 @@ namespace HexcellsHelper
                 if (tr.tag == "Blue")
                 {
                     kind = 'x';
-                    info = tr.name == "Blue Hex (Flower)" ? '+' : '.';
+                    info = tr.name switch
+                    {
+                        "Blue Hex (Flower)" => '+',
+                        _ => '.'
+                    };
                 }
                 else
                 {
                     kind = 'o';
-                    switch (tr.tag)
+                    info = tr.tag switch
                     {
-                        case "Clue Hex Blank":
-                            info = '.';
-                            break;
-                        case "Clue Hex (Sequential)":
-                            info = 'c';
-                            break;
-                        case "Clue Hex (NOT Sequential)":
-                            info = 'n';
-                            break;
-                        default:
-                            info = '+';
-                            break;
-                    }
+                        "Clue Hex Blank" => '.',
+                        "Clue Hex (Sequential)" => 'c',
+                        "Clue Hex (NOT Sequential)" => 'n',
+                        _ => '+',
+                    };
                 }
 
                 if (!hiddenHexes[yi, xi]) kind = char.ToUpper(kind);
@@ -97,18 +93,18 @@ namespace HexcellsHelper
                 int yi = CoordUtil.WorldToGridY(tr.position.y);
                 if (!CoordUtil.IsValidCoord(xi, yi)) continue;
 
-                char kind = '|', info = '+';
-                switch (tr.name)
+                char kind = tr.name switch
                 {
-                    case "Column Number Diagonal Right":
-                        kind = '\\';
-                        break;
-                    case "Column Number Diagonal Left":
-                        kind = '/';
-                        break;
-                }
-                if (tr.tag == "Column Sequential") info = 'c';
-                else if (tr.tag == "Column NOT Sequential") info = 'n';
+                    "Column Number Diagonal Right" => '\\',
+                    "Column Number Diagonal Left" => '/',
+                    _ => '|',
+                };
+                char info = tr.tag switch
+                {
+                    "Column Sequential" => 'c',
+                    "Column NOT Sequential" => 'n',
+                    _ => '+'
+                };
 
                 grid[yi, xi * 2] = kind;
                 grid[yi, xi * 2 + 1] = info;
