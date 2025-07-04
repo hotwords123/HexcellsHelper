@@ -1,13 +1,11 @@
 using UnityEngine;
 using System;
-using System.IO;
 using System.Text;
 
 namespace HexcellsHelper
 {
     public class LevelDumper : MonoBehaviour
     {
-        const int W = 33, H = 33;
         const string Header = "Hexcells level v1";
 
         void Update()
@@ -30,11 +28,6 @@ namespace HexcellsHelper
             }
         }
 
-        bool IsValidCoord(int x, int y)
-        {
-            return x >= 0 && x < W && y >= 0 && y < H;
-        }
-
         string SerializeCurrentLevel()
         {
             var hexGrid = GameObject.Find("Hex Grid");
@@ -45,25 +38,25 @@ namespace HexcellsHelper
                 return null;
             }
 
-            char[,] grid = new char[H, W * 2];
-            for (int y = 0; y < H; y++)
-                for (int x = 0; x < W * 2; x++)
+            char[,] grid = new char[CoordUtil.Height, CoordUtil.Width * 2];
+            for (int y = 0; y < CoordUtil.Height; y++)
+                for (int x = 0; x < CoordUtil.Width * 2; x++)
                     grid[y, x] = '.';
 
-            bool[,] hiddenHexes = new bool[H, W];
+            bool[,] hiddenHexes = new bool[CoordUtil.Height, CoordUtil.Width];
             foreach (Transform tr in hexGridOverlay.transform)
             {
-                int xi = Mathf.RoundToInt(tr.position.x / 0.88f) + 15;
-                int yi = Mathf.RoundToInt(tr.position.y / 0.5f) + 15;
-                if (!IsValidCoord(xi, yi)) continue;
+                int xi = CoordUtil.WorldToGridX(tr.position.x);
+                int yi = CoordUtil.WorldToGridY(tr.position.y);
+                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
                 hiddenHexes[yi, xi] = true;
             }
 
             foreach (Transform tr in hexGrid.transform)
             {
-                int xi = Mathf.RoundToInt(tr.position.x / 0.88f) + 15;
-                int yi = Mathf.RoundToInt(tr.position.y / 0.5f) + 15;
-                if (!IsValidCoord(xi, yi)) continue;
+                int xi = CoordUtil.WorldToGridX(tr.position.x);
+                int yi = CoordUtil.WorldToGridY(tr.position.y);
+                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
 
                 char kind, info;
 
@@ -100,9 +93,9 @@ namespace HexcellsHelper
 
             foreach (Transform tr in GameObject.Find("Columns Parent").transform)
             {
-                int xi = Mathf.RoundToInt(tr.position.x / 0.88f) + 15;
-                int yi = Mathf.RoundToInt(tr.position.y / 0.5f) + 15;
-                if (!IsValidCoord(xi, yi)) continue;
+                int xi = CoordUtil.WorldToGridX(tr.position.x);
+                int yi = CoordUtil.WorldToGridY(tr.position.y);
+                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
 
                 char kind = '|', info = '+';
                 switch (tr.name)
@@ -130,9 +123,9 @@ namespace HexcellsHelper
             sb.AppendLine("");
             sb.AppendLine("");
 
-            for (int y = H - 1; y >= 0; y--)
+            for (int y = CoordUtil.Height - 1; y >= 0; y--)
             {
-                for (int x = 0; x < W * 2; x++)
+                for (int x = 0; x < CoordUtil.Width * 2; x++)
                     sb.Append(grid[y, x]);
                 sb.AppendLine();
             }
