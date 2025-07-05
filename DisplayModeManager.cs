@@ -9,10 +9,16 @@ namespace HexcellsHelper
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Tab))
+            // Toggle display mode when T is pressed
+            if (Input.GetKeyDown(KeyCode.T))
             {
-                countRemainingOnly = !countRemainingOnly;
-                UpdateHexNumbers();
+                ToggleDisplayMode();
+            }
+
+            // Toggle display mode when Tab is pressed or released
+            if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyUp(KeyCode.Tab))
+            {
+                ToggleDisplayMode();
             }
         }
 
@@ -31,6 +37,22 @@ namespace HexcellsHelper
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             UpdateHexNumbers();
+        }
+
+        void ToggleDisplayMode()
+        {
+            countRemainingOnly = !countRemainingOnly;
+            UpdateHexNumbers();
+
+            var musicDirector = GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>();
+            if (countRemainingOnly)
+            {
+                musicDirector.PlayNoteA(0.0f);
+            }
+            else
+            {
+                musicDirector.PlayNoteB(0.0f);
+            }
         }
 
         public void UpdateHexNumbers()
