@@ -2,16 +2,10 @@ using UnityEngine;
 
 namespace HexcellsHelper
 {
-    public class ClickUndoAction : IUndoableAction
+    public class ClickUndoAction(HexBehaviour hex) : IUndoableAction
     {
-        private Vector3 position;
-        private bool containsShapeBlock;
-
-        public ClickUndoAction(HexBehaviour hex)
-        {
-            position = hex.transform.position;
-            containsShapeBlock = hex.containsShapeBlock;
-        }
+        private Vector3 position = hex.transform.position;
+        private bool containsShapeBlock = hex.containsShapeBlock;
 
         public void Undo()
         {

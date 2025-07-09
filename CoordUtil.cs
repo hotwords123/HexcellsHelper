@@ -54,8 +54,8 @@ namespace HexcellsHelper
             new Coordinate(-1, 3),
         ];
 
-        public static readonly Coordinate diagonalLeftCoord = new Coordinate(-1, -1);
-        public static readonly Coordinate diagonalRightCoord = new Coordinate(1, -1);
-        public static readonly Coordinate verticalCoord = new Coordinate(0, -2);
+        public static readonly Coordinate diagonalLeftCoord = new(-1, -1);
+        public static readonly Coordinate diagonalRightCoord = new(1, -1);
+        public static readonly Coordinate verticalCoord = new(0, -2);
     }
 }
