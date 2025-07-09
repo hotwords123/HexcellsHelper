@@ -148,7 +148,6 @@ namespace HexcellsHelper
                 {
                     int xi = CoordUtil.WorldToGridX(tr.position.x);
                     int yi = CoordUtil.WorldToGridY(tr.position.y);
-                    if (!CoordUtil.IsValidCoord(xi, yi)) continue;
 
                     Coordinate direction = tr.name switch
                     {
