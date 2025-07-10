@@ -26,3 +26,12 @@
 
 5. **Launch the game**
    - Start the game to load the plugin.
+
+## Usage
+
+The HexcellsHelper plugin provides the following functionalities in game:
+
+- **F2**: Copies the current level state to the clipboard in the [SixCells editor format](https://github.com/oprypin/sixcells?tab=readme-ov-file#level-file-structure).
+- **Z**: Undoes the last action (left-click or right-click).
+- **T**: Toggles the display mode (whether the numbers on the cells represent the total number of blue cells or the remaining blue cells).
+- **Tab**: Temporarily switches the display mode while held down (reverts when released).
