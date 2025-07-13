@@ -23,13 +23,13 @@ namespace HexcellsHelper
             EventManager.HighlightClicked += UpdateMap;
         }
 
-        public static bool Hidden(int x, int y)
+        public static bool IsHidden(int x, int y)
         {
             return gridOverlay[x, y] != null;
         }
-        public static bool Hidden(Coordinate coordinate)
+        public static bool IsHidden(Coordinate coordinate)
         {
-            return Hidden(coordinate.x, coordinate.y);
+            return IsHidden(coordinate.x, coordinate.y);
         }
 
         public static void SetBlack(int x, int y)
@@ -75,7 +75,7 @@ namespace HexcellsHelper
                 remainingText.text = (score.numberOfBlueTiles - score.numberOfCorrectTilesFound).ToString();
                 BepInEx.Bootstrap.Chainloader.ManagerObject
                     .GetComponent<DisplayModeManager>()
-                    .UpdateHexNumbers(); 
+                    .UpdateHexNumbers();
             }
             score.tilesRemoved--;
             musicDirector.PlayWrongNote(gridOverlay[x, y].transform.position.x / 7.04f);
@@ -131,6 +131,6 @@ namespace HexcellsHelper
             gridOverlay[coordinate.x, coordinate.y] = null;
         }
 
-        
+
     }
 }

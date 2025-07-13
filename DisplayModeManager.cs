@@ -81,7 +81,7 @@ namespace HexcellsHelper
                         int yi = y + coord.y;
                         if (CoordUtil.IsValidCoord(xi, yi)
                             && MapManager.grid[xi, yi]?.tag == "Blue"
-                            && (!countRemainingOnly || MapManager.Hidden(xi, yi)))
+                            && (!countRemainingOnly || MapManager.IsHidden(xi, yi)))
                         {
                             blueCount++;
                         }
@@ -130,7 +130,7 @@ namespace HexcellsHelper
                         yi += direction.y;
                         if (!CoordUtil.IsValidCoord(xi, yi)) break;
 
-                        if (MapManager.grid[xi, yi]?.tag == "Blue" && (!countRemainingOnly || MapManager.Hidden(xi, yi)))
+                        if (MapManager.grid[xi, yi]?.tag == "Blue" && (!countRemainingOnly || MapManager.IsHidden(xi, yi)))
                         {
                             blueCount++;
                         }

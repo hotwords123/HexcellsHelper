@@ -71,7 +71,7 @@ namespace HexcellsHelper
                         };
                     }
 
-                    if (!MapManager.Hidden(x, y))
+                    if (!MapManager.IsHidden(x, y))
                     {
                         kind = char.ToUpper(kind);
                     }
