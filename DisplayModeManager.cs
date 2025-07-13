@@ -25,12 +25,13 @@ namespace HexcellsHelper
         void OnEnable()
         {
             EventManager.LevelLoaded += UpdateHexNumbers;
-            EventManager.HighlightClicked += (_) => UpdateHexNumbers();
+            EventManager.HighlightClicked += UpdateHexNumbers;
         }
 
         void OnDisable()
         {
             EventManager.LevelLoaded -= UpdateHexNumbers;
+            EventManager.HighlightClicked -= UpdateHexNumbers;
         }
 
         void ToggleDisplayMode()
@@ -46,6 +47,12 @@ namespace HexcellsHelper
             {
                 MapManager.musicDirector.PlayNoteB(0.0f);
             }
+        }
+
+        void UpdateHexNumbers(HexBehaviour hexBehaviour)
+        {
+            // Update hex numbers based on the current display mode
+            UpdateHexNumbers();
         }
 
         public void UpdateHexNumbers()
