@@ -39,8 +39,7 @@ namespace HexcellsHelper
         {
             if (undoStack.Count > 0)
             {
-                var coordinate = undoStack.Pop();
-                MapManager.SetYellow(coordinate);
+                MapManager.SetYellow(undoStack.Pop());
             }
         }
     }

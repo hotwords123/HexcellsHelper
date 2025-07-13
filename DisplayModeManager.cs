@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -57,103 +58,93 @@ namespace HexcellsHelper
 
         public void UpdateHexNumbers()
         {
-            for (int x = 0; x < CoordUtil.Width; x++)
+            foreach (var coord in CoordUtil.IterGrid())
             {
-                for (int y = 0; y < CoordUtil.Height; y++)
+                var cell = MapManager.GridAt(coord);
+                if (cell == null)
                 {
-                    var cell = MapManager.grid[x, y];
-                    if (cell == null) continue;
-
-                    Coordinate[] coords;
-                    if (cell.tag == "Blue")
-                    {
-                        // Skip non-flower blue hexes
-                        if (cell.name != "Blue Hex (Flower)") continue;
-                        // Use flower coordinates for blue hexes
-                        coords = CoordUtil.flowerCoords;
-                    }
-                    else
-                    {
-                        // Skip blank black hexes
-                        if (cell.tag.StartsWith("Clue Hex Blank")) continue;
-                        // Use surrounding coordinates for clue hexes
-                        coords = CoordUtil.surroundCoords;
-                    }
-
-                    // Count the number of blue hexes in the surrounding coordinates
-                    int blueCount = 0;
-                    foreach (var coord in coords)
-                    {
-                        int xi = x + coord.x;
-                        int yi = y + coord.y;
-                        if (CoordUtil.IsValidCoord(xi, yi)
-                            && MapManager.grid[xi, yi]?.tag == "Blue"
-                            && (!countRemainingOnly || MapManager.IsHidden(xi, yi)))
-                        {
-                            blueCount++;
-                        }
-                    }
-
-                    // Update the hex number text
-                    string text = blueCount.ToString();
-                    if (cell.tag.StartsWith("Clue Hex (Sequential)"))
-                    {
-                        text = "{" + text + "}";
-                    }
-                    else if (cell.tag.StartsWith("Clue Hex (NOT Sequential)"))
-                    {
-                        text = "-" + text + "-";
-                    }
-                    cell.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
+                    continue;
                 }
+
+                IEnumerable<Coordinate> otherCoords;
+                if (cell.tag == "Blue")
+                {
+                    // Skip non-flower blue hexes
+                    if (cell.name != "Blue Hex (Flower)") continue;
+                    // Use flower coordinates for blue hexes
+                    otherCoords = CoordUtil.FlowerCoords(coord);
+                }
+                else
+                {
+                    // Skip blank black hexes
+                    if (cell.tag.StartsWith("Clue Hex Blank")) continue;
+                    // Use surrounding coordinates for clue hexes
+                    otherCoords = CoordUtil.SurroundCoords(coord);
+                }
+
+                // Count the number of blue hexes in the surrounding coordinates
+                int blueCount = 0;
+                foreach (var othercoord in otherCoords)
+                {
+                    if (CoordUtil.IsValidCoord(othercoord)
+                        && MapManager.GridAt(othercoord)?.tag == "Blue"
+                        && (!countRemainingOnly || MapManager.IsHidden(othercoord)))
+                    {
+                        blueCount++;
+                    }
+                }
+
+                // Update the hex number text
+                string text = blueCount.ToString();
+                if (cell.tag.StartsWith("Clue Hex (Sequential)"))
+                {
+                    text = "{" + text + "}";
+                }
+                else if (cell.tag.StartsWith("Clue Hex (NOT Sequential)"))
+                {
+                    text = "-" + text + "-";
+                }
+                cell.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
             }
 
+
             var columnParent = GameObject.Find("Columns Parent");
-            if (columnParent != null)
+            if (columnParent == null)
             {
-                foreach (Transform tr in columnParent.transform)
+                return;
+            }
+            foreach (Transform tr in columnParent.transform)
+            {
+                var coord = CoordUtil.WorldToGrid(tr.position);
+
+                IEnumerable<Coordinate> otherCoords = tr.name switch
                 {
-                    var coordinate = CoordUtil.WorldToGrid(tr.position);
-                    var xi = coordinate.x;
-                    var yi = coordinate.y;
-                    switch (tr.name)
-                    {
-                        case "Hello":
-                        default:
-                            break;
-                    }
+                    "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoord(coord),
+                    "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoord(coord),
+                    _ => CoordUtil.VerticalCoord(coord),
+                };
 
-                    Coordinate direction = tr.name switch
-                    {
-                        "Column Number Diagonal Left" => CoordUtil.diagonalLeftCoord,
-                        "Column Number Diagonal Right" => CoordUtil.diagonalRightCoord,
-                        _ => CoordUtil.verticalCoord,
-                    };
+                int blueCount = 0;
 
-                    int blueCount = 0;
-                    while (true)
+                foreach (var othercoord in otherCoords)
+                {
+                    if (MapManager.GridAt(othercoord)?.tag == "Blue" &&
+                    (!countRemainingOnly || MapManager.IsHidden(othercoord)))
                     {
-                        xi += direction.x;
-                        yi += direction.y;
-                        if (!CoordUtil.IsValidCoord(xi, yi)) break;
-
-                        if (MapManager.grid[xi, yi]?.tag == "Blue" && (!countRemainingOnly || MapManager.IsHidden(xi, yi)))
-                        {
-                            blueCount++;
-                        }
+                        blueCount++;
                     }
-
-                    string text = blueCount.ToString();
-                    if (tr.tag == "Column Sequential")
-                    {
-                        text = "{" + text + "}";
-                    }
-                    else if (tr.tag == "Column NOT Sequential")
-                    {
-                        text = "-" + text + "-";
-                    }
-                    tr.GetComponent<TextMesh>().text = text;
                 }
+
+                string text = blueCount.ToString();
+                if (tr.tag == "Column Sequential")
+                {
+                    text = "{" + text + "}";
+                }
+                else if (tr.tag == "Column NOT Sequential")
+                {
+                    text = "-" + text + "-";
+                }
+                tr.GetComponent<TextMesh>().text = text;
             }
         }
     }

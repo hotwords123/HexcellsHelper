@@ -27,9 +27,19 @@ namespace HexcellsHelper
         {
             return gridOverlay[x, y] != null;
         }
-        public static bool IsHidden(Coordinate coordinate)
+        public static bool IsHidden(Coordinate coord)
         {
-            return IsHidden(coordinate.x, coordinate.y);
+            return IsHidden(coord.X, coord.Y);
+        }
+
+        public static GameObject GridAt(Coordinate coord)
+        {
+            return grid[coord.X, coord.Y];
+        }
+
+        public static GameObject GridOverlayAt(Coordinate coord)
+        {
+            return gridOverlay[coord.X, coord.Y];
         }
 
         public static void SetBlack(int x, int y)
@@ -39,9 +49,9 @@ namespace HexcellsHelper
             gridOverlay[x, y]?.transform.GetComponent<HexBehaviour>().DestroyClick();
         }
 
-        public static void SetBlack(Coordinate coordinate)
+        public static void SetBlack(Coordinate coord)
         {
-            SetBlack(coordinate.x, coordinate.y);
+            SetBlack(coord.X, coord.Y);
         }
 
         public static void SetBlue(int x, int y)
@@ -51,9 +61,9 @@ namespace HexcellsHelper
             gridOverlay[x, y]?.transform.GetComponent<HexBehaviour>().HighlightClick();
         }
 
-        public static void SetBlue(Coordinate coordinate)
+        public static void SetBlue(Coordinate coord)
         {
-            SetBlue(coordinate.x, coordinate.y);
+            SetBlue(coord.X, coord.Y);
         }
 
         public static bool SetYellow(int x, int y)
@@ -83,9 +93,9 @@ namespace HexcellsHelper
             return true;
         }
 
-        public static bool SetYellow(Coordinate coordinate)
+        public static bool SetYellow(Coordinate coord)
         {
-            return SetYellow(coordinate.x, coordinate.y);
+            return SetYellow(coord.X, coord.Y);
         }
 
         static void InitializeMap()
@@ -100,23 +110,23 @@ namespace HexcellsHelper
             grid = new GameObject[CoordUtil.Width, CoordUtil.Height];
             foreach (Transform tr in hexGrid.transform)
             {
-                var coordinate = CoordUtil.WorldToGrid(tr.position);
-                if (!CoordUtil.IsValidCoord(coordinate))
+                var coord = CoordUtil.WorldToGrid(tr.position);
+                if (!CoordUtil.IsValidCoord(coord))
                 {
                     continue;
                 }
-                grid[coordinate.x, coordinate.y] = tr.gameObject;
+                grid[coord.X, coord.Y] = tr.gameObject;
             }
 
             gridOverlay = new GameObject[CoordUtil.Width, CoordUtil.Height];
             foreach (Transform tr in hexGridOverlay.transform)
             {
-                var coordinate = CoordUtil.WorldToGrid(tr.position);
-                if (!CoordUtil.IsValidCoord(coordinate))
+                var coord = CoordUtil.WorldToGrid(tr.position);
+                if (!CoordUtil.IsValidCoord(coord))
                 {
                     continue;
                 }
-                gridOverlay[coordinate.x, coordinate.y] = tr.gameObject;
+                gridOverlay[coord.X, coord.Y] = tr.gameObject;
             }
         }
 
@@ -127,8 +137,8 @@ namespace HexcellsHelper
                 return;
             }
             var position = hexBehaviour.transform.position;
-            var coordinate = CoordUtil.WorldToGrid(position);
-            gridOverlay[coordinate.x, coordinate.y] = null;
+            var coord = CoordUtil.WorldToGrid(position);
+            gridOverlay[coord.X, coord.Y] = null;
         }
 
 

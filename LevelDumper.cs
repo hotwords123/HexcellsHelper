@@ -16,7 +16,7 @@ namespace HexcellsHelper
                 if (string.IsNullOrEmpty(levelText))
                 {
                     Debug.LogError("[LevelDumper] Failed to serialize the current level.");
-                    GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>().PlayWrongNote(0.0f);
+                    MapManager.musicDirector.PlayWrongNote(0.0f);
                     return;
                 }
 
@@ -39,55 +39,48 @@ namespace HexcellsHelper
                 }
             }
 
-            for (int x = 0; x < CoordUtil.Width; x++)
+            foreach (var coord in CoordUtil.IterGrid())
             {
-                for (int y = 0; y < CoordUtil.Height; y++)
+                var cell = MapManager.GridAt(coord);
+                if (cell == null)
                 {
-                    var tr = MapManager.grid[x, y];
-                    if (tr == null)
-                    {
-                        continue;
-                    }
-
-                    char kind, info;
-                    if (tr.tag == "Blue")
-                    {
-                        kind = 'x';
-                        info = tr.name switch
-                        {
-                            "Blue Hex (Flower)" => '+',
-                            _ => '.'
-                        };
-                    }
-                    else
-                    {
-                        kind = 'o';
-                        info = tr.tag switch
-                        {
-                            "Clue Hex Blank" => '.',
-                            "Clue Hex (Sequential)" => 'c',
-                            "Clue Hex (NOT Sequential)" => 'n',
-                            _ => '+',
-                        };
-                    }
-
-                    if (!MapManager.IsHidden(x, y))
-                    {
-                        kind = char.ToUpper(kind);
-                    }
-
-                    grid[x * 2, y] = kind;
-                    grid[x * 2 + 1, y] = info;
+                    continue;
                 }
+
+                char kind, info;
+                if (cell.tag == "Blue")
+                {
+                    kind = 'x';
+                    info = cell.name switch
+                    {
+                        "Blue Hex (Flower)" => '+',
+                        _ => '.'
+                    };
+                }
+                else
+                {
+                    kind = 'o';
+                    info = cell.tag switch
+                    {
+                        "Clue Hex Blank" => '.',
+                        "Clue Hex (Sequential)" => 'c',
+                        "Clue Hex (NOT Sequential)" => 'n',
+                        _ => '+',
+                    };
+                }
+
+                if (!MapManager.IsHidden(coord))
+                {
+                    kind = char.ToUpper(kind);
+                }
+
+                grid[coord.X * 2, coord.Y] = kind;
+                grid[coord.X * 2 + 1, coord.Y] = info;
             }
 
             foreach (Transform tr in GameObject.Find("Columns Parent").transform)
             {
-                var coordinate = CoordUtil.WorldToGrid(tr.position);
-                if (!CoordUtil.IsValidCoord(coordinate))
-                {
-                    continue;
-                }
+                var coord = CoordUtil.WorldToGrid(tr.position);
 
                 char kind = tr.name switch
                 {
@@ -101,8 +94,8 @@ namespace HexcellsHelper
                     "Column NOT Sequential" => 'n',
                     _ => '+'
                 };
-                var x = coordinate.x;
-                var y = coordinate.y;
+                var x = coord.X;
+                var y = coord.Y;
                 grid[x * 2, y] = kind;
                 grid[x * 2 + 1, y] = info;
             }

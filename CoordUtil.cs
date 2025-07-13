@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HexcellsHelper
 {
+    public record struct Coordinate(int X, int Y);
     public static class CoordUtil
     {
         public const int Width = 33;
@@ -11,54 +13,92 @@ namespace HexcellsHelper
         {
             return 0 <= x && x < Width && 0 <= y && y < Height;
         }
-        public static bool IsValidCoord(Coordinate coordinate)
+        public static bool IsValidCoord(Coordinate coord)
         {
-            return IsValidCoord(coordinate.x, coordinate.y);
+            return IsValidCoord(coord.X, coord.Y);
         }
 
         public static Coordinate WorldToGrid(Vector3 vec)
         {
-            return new Coordinate(
+            return new(
                 Mathf.RoundToInt(vec.x / 0.88f) + 15,
                 Mathf.RoundToInt(vec.y / 0.5f) + 15
             );
         }
 
+        public static IEnumerable<Coordinate> IterGrid()
+        {
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    yield return new(x, y);
+                }
+            }
+        }
 
-        public static readonly Coordinate[] surroundCoords =
-        [
-            new Coordinate(0, 2),
-            new Coordinate(1, 1),
-            new Coordinate(1, -1),
-            new Coordinate(0, -2),
-            new Coordinate(-1, -1),
-            new Coordinate(-1, 1),
-        ];
+        public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
+        {
+            yield return new(coord.X + 0, coord.Y + 2);
+            yield return new(coord.X + 1, coord.Y + 1);
+            yield return new(coord.X + 1, coord.Y - 1);
+            yield return new(coord.X + 0, coord.Y - 2);
+            yield return new(coord.X + -1, coord.Y - 1);
+            yield return new(coord.X + -1, coord.Y + 1);
+        }
+        public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
+        {
+            yield return new(coord.X + 0, coord.Y + 2);
+            yield return new(coord.X + 1, coord.Y + 1);
+            yield return new(coord.X + 1, coord.Y - 1);
+            yield return new(coord.X + 0, coord.Y - 2);
+            yield return new(coord.X - 1, coord.Y - 1);
+            yield return new(coord.X - 1, coord.Y + 1);
+            yield return new(coord.X + 0, coord.Y + 4);
+            yield return new(coord.X + 1, coord.Y + 3);
+            yield return new(coord.X + 2, coord.Y + 2);
+            yield return new(coord.X + 2, coord.Y + 0);
+            yield return new(coord.X + 2, coord.Y - 2);
+            yield return new(coord.X + 1, coord.Y - 3);
+            yield return new(coord.X + 0, coord.Y - 4);
+            yield return new(coord.X - 1, coord.Y - 3);
+            yield return new(coord.X - 2, coord.Y - 2);
+            yield return new(coord.X - 2, coord.Y + 0);
+            yield return new(coord.X - 2, coord.Y + 2);
+            yield return new(coord.X - 1, coord.Y + 3);
+        }
+        public static IEnumerable<Coordinate> DiagonalLeftCoord(Coordinate coord)
+        {
+            var x = coord.X - 1;
+            var y = coord.Y - 1;
+            while (IsValidCoord(x, y))
+            {
+                yield return new(x, y);
+                x--;
+                y--;
+            }
+        }
+        public static IEnumerable<Coordinate> DiagonalRightCoord(Coordinate coord)
+        {
+            var x = coord.X + 1;
+            var y = coord.Y - 1;
+            while (IsValidCoord(x, y))
+            {
+                yield return new(x, y);
+                x++;
+                y--;
+            }
+        }
 
-        public static readonly Coordinate[] flowerCoords =
-        [
-            new Coordinate(0, 2),
-            new Coordinate(1, 1),
-            new Coordinate(1, -1),
-            new Coordinate(0, -2),
-            new Coordinate(-1, -1),
-            new Coordinate(-1, 1),
-            new Coordinate(0, 4),
-            new Coordinate(1, 3),
-            new Coordinate(2, 2),
-            new Coordinate(2, 0),
-            new Coordinate(2, -2),
-            new Coordinate(1, -3),
-            new Coordinate(0, -4),
-            new Coordinate(-1, -3),
-            new Coordinate(-2, -2),
-            new Coordinate(-2, 0),
-            new Coordinate(-2, 2),
-            new Coordinate(-1, 3),
-        ];
-
-        public static readonly Coordinate diagonalLeftCoord = new(-1, -1);
-        public static readonly Coordinate diagonalRightCoord = new(1, -1);
-        public static readonly Coordinate verticalCoord = new(0, -2);
+        public static IEnumerable<Coordinate> VerticalCoord(Coordinate coord)
+        {
+            var x = coord.X;
+            var y = coord.Y - 2;
+            while (IsValidCoord(x, y))
+            {
+                yield return new(x, y);
+                y -= 2;
+            }
+        }
     }
 }
