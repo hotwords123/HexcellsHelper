@@ -30,68 +30,64 @@ namespace HexcellsHelper
 
         string SerializeCurrentLevel()
         {
-            var hexGrid = GameObject.Find("Hex Grid");
-            var hexGridOverlay = GameObject.Find("Hex Grid Overlay");
-            if (hexGrid == null || hexGridOverlay == null)
+            char[,] grid = new char[CoordUtil.Width * 2, CoordUtil.Height];
+            for (int x = 0; x < CoordUtil.Width * 2; x++)
             {
-                Debug.LogError("[LevelDumper] Hex Grid or Hex Grid Overlay not found!");
-                return null;
+                for (int y = 0; y < CoordUtil.Height; y++)
+                {
+                    grid[x, y] = '.';
+                }
             }
 
-            char[,] grid = new char[CoordUtil.Height, CoordUtil.Width * 2];
-            for (int y = 0; y < CoordUtil.Height; y++)
-                for (int x = 0; x < CoordUtil.Width * 2; x++)
-                    grid[y, x] = '.';
-
-            bool[,] hiddenHexes = new bool[CoordUtil.Height, CoordUtil.Width];
-            foreach (Transform tr in hexGridOverlay.transform)
+            for (int x = 0; x < CoordUtil.Width; x++)
             {
-                int xi = CoordUtil.WorldToGridX(tr.position.x);
-                int yi = CoordUtil.WorldToGridY(tr.position.y);
-                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
-                hiddenHexes[yi, xi] = true;
-            }
-
-            foreach (Transform tr in hexGrid.transform)
-            {
-                int xi = CoordUtil.WorldToGridX(tr.position.x);
-                int yi = CoordUtil.WorldToGridY(tr.position.y);
-                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
-
-                char kind, info;
-
-                if (tr.tag == "Blue")
+                for (int y = 0; y < CoordUtil.Height; y++)
                 {
-                    kind = 'x';
-                    info = tr.name switch
+                    var tr = MapManager.grid[x, y];
+                    if (tr == null)
                     {
-                        "Blue Hex (Flower)" => '+',
-                        _ => '.'
-                    };
-                }
-                else
-                {
-                    kind = 'o';
-                    info = tr.tag switch
+                        continue;
+                    }
+
+                    char kind, info;
+                    if (tr.tag == "Blue")
                     {
-                        "Clue Hex Blank" => '.',
-                        "Clue Hex (Sequential)" => 'c',
-                        "Clue Hex (NOT Sequential)" => 'n',
-                        _ => '+',
-                    };
+                        kind = 'x';
+                        info = tr.name switch
+                        {
+                            "Blue Hex (Flower)" => '+',
+                            _ => '.'
+                        };
+                    }
+                    else
+                    {
+                        kind = 'o';
+                        info = tr.tag switch
+                        {
+                            "Clue Hex Blank" => '.',
+                            "Clue Hex (Sequential)" => 'c',
+                            "Clue Hex (NOT Sequential)" => 'n',
+                            _ => '+',
+                        };
+                    }
+
+                    if (!MapManager.Hidden(x, y))
+                    {
+                        kind = char.ToUpper(kind);
+                    }
+
+                    grid[x * 2, y] = kind;
+                    grid[x * 2 + 1, y] = info;
                 }
-
-                if (!hiddenHexes[yi, xi]) kind = char.ToUpper(kind);
-
-                grid[yi, xi * 2] = kind;
-                grid[yi, xi * 2 + 1] = info;
             }
 
             foreach (Transform tr in GameObject.Find("Columns Parent").transform)
             {
-                int xi = CoordUtil.WorldToGridX(tr.position.x);
-                int yi = CoordUtil.WorldToGridY(tr.position.y);
-                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
+                var coordinate = CoordUtil.WorldToGrid(tr.position);
+                if (!CoordUtil.IsValidCoord(coordinate))
+                {
+                    continue;
+                }
 
                 char kind = tr.name switch
                 {
@@ -105,9 +101,10 @@ namespace HexcellsHelper
                     "Column NOT Sequential" => 'n',
                     _ => '+'
                 };
-
-                grid[yi, xi * 2] = kind;
-                grid[yi, xi * 2 + 1] = info;
+                var x = coordinate.x;
+                var y = coordinate.y;
+                grid[x * 2, y] = kind;
+                grid[x * 2 + 1, y] = info;
             }
 
             var sb = new StringBuilder();
@@ -122,7 +119,9 @@ namespace HexcellsHelper
             for (int y = CoordUtil.Height - 1; y >= 0; y--)
             {
                 for (int x = 0; x < CoordUtil.Width * 2; x++)
-                    sb.Append(grid[y, x]);
+                {
+                    sb.Append(grid[x, y]);
+                }
                 sb.AppendLine();
             }
 
