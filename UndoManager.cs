@@ -1,17 +1,12 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 namespace HexcellsHelper
 {
-    public interface IUndoableAction
-    {
-        void Undo();
-    }
 
     public class UndoManager : MonoBehaviour
     {
-        private Stack<IUndoableAction> undoStack = new();
+        readonly Stack<Coordinate> undoStack = new();
 
         void Update()
         {
@@ -23,35 +18,29 @@ namespace HexcellsHelper
 
         void OnEnable()
         {
-            SceneManager.sceneLoaded += OnSceneLoaded;
+            EventManager.LevelLoaded += undoStack.Clear;
+            EventManager.DestroyClicked += AddAction;
+            EventManager.HighlightClicked += AddAction;
         }
 
         void OnDisable()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
+            EventManager.LevelLoaded -= undoStack.Clear;
+            EventManager.DestroyClicked -= AddAction;
+            EventManager.HighlightClicked -= AddAction;
         }
 
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        void AddAction(HexBehaviour hexBehaviour)
         {
-            ClearActions();
-        }
-
-        public void ClearActions()
-        {
-            undoStack.Clear();
-        }
-
-        public void AddAction(IUndoableAction action)
-        {
-            undoStack.Push(action);
+            undoStack.Push(CoordUtil.WorldToGrid(hexBehaviour.transform.position));
         }
 
         public void UndoLastAction()
         {
             if (undoStack.Count > 0)
             {
-                var action = undoStack.Pop();
-                action.Undo();
+                var coordinate = undoStack.Pop();
+                MapManager.SetYellow(coordinate);
             }
         }
     }
