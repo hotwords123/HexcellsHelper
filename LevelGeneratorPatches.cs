@@ -2,13 +2,21 @@ using HarmonyLib;
 
 namespace HexcellsHelper
 {
-    [HarmonyPatch(typeof(LevelGenerator), "SetupLevel")]
-    public class Patch_LevelGenerator_SetupLevel
+    [HarmonyPatch(typeof(LevelGenerator), "Start")]
+    public class Patch_LevelGenerator_Start
     {
         static void Postfix(LevelGenerator __instance)
         {
-            var displayModeManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<DisplayModeManager>();
-            displayModeManager?.UpdateHexNumbers();
+            EventManager.OnLevelLoaded();
+        }
+    }
+
+    [HarmonyPatch(typeof(OldLevelGenerator), "Start")]
+    public class Patch_OldLevelGenerator_Start
+    {
+        static void Postfix(OldLevelGenerator __instance)
+        {
+            EventManager.OnLevelLoaded();
         }
     }
 }

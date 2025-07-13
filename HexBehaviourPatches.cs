@@ -7,10 +7,10 @@ namespace HexcellsHelper
     {
         static void Postfix(HexBehaviour __instance)
         {
-            if (__instance.containsShapeBlock) return;
-
-            var undoManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<UndoManager>();
-            undoManager.AddAction(new ClickUndoAction(__instance));
+            if (!__instance.containsShapeBlock)
+            {
+                EventManager.OnDestroyClick(__instance);
+            }
         }
     }
 
@@ -19,13 +19,10 @@ namespace HexcellsHelper
     {
         static void Postfix(HexBehaviour __instance)
         {
-            if (!__instance.containsShapeBlock) return;
-
-            var undoManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<UndoManager>();
-            undoManager.AddAction(new ClickUndoAction(__instance));
-
-            var displayModeManager = BepInEx.Bootstrap.Chainloader.ManagerObject.GetComponent<DisplayModeManager>();
-            displayModeManager.UpdateHexNumbers();
+            if (__instance.containsShapeBlock)
+            {
+                EventManager.OnHighlightClick(__instance);
+            }
         }
     }
 }
