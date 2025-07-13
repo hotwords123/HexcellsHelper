@@ -9,18 +9,21 @@ namespace HexcellsHelper
 
         public static bool IsValidCoord(int x, int y)
         {
-            return x >= 0 && x < Width && y >= 0 && y < Height;
+            return 0 <= x && x < Width && 0 <= y && y < Height;
+        }
+        public static bool IsValidCoord(Coordinate coordinate)
+        {
+            return IsValidCoord(coordinate.x, coordinate.y);
         }
 
-        public static int WorldToGridX(float worldX)
+        public static Coordinate WorldToGrid(Vector3 vec)
         {
-            return Mathf.RoundToInt(worldX / 0.88f) + 15;
+            return new Coordinate(
+                Mathf.RoundToInt(vec.x / 0.88f) + 15,
+                Mathf.RoundToInt(vec.y / 0.5f) + 15
+            );
         }
 
-        public static int WorldToGridY(float worldY)
-        {
-            return Mathf.RoundToInt(worldY / 0.5f) + 15;
-        }
 
         public static readonly Coordinate[] surroundCoords =
         [
