@@ -24,19 +24,13 @@ namespace HexcellsHelper
 
         void OnEnable()
         {
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            Debug.Log("[DisplayModeManager] DisplayModeManager enabled. Listening for scene loads.");
+            EventManager.LevelLoaded += UpdateHexNumbers;
+            EventManager.HighlightClicked += (_) => UpdateHexNumbers();
         }
 
         void OnDisable()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            Debug.Log("[DisplayModeManager] DisplayModeManager disabled. Stopped listening for scene loads.");
-        }
-
-        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            UpdateHexNumbers();
+            EventManager.LevelLoaded -= UpdateHexNumbers;
         }
 
         void ToggleDisplayMode()
@@ -44,57 +38,23 @@ namespace HexcellsHelper
             countRemainingOnly = !countRemainingOnly;
             UpdateHexNumbers();
 
-            var musicDirector = GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>();
             if (countRemainingOnly)
             {
-                musicDirector.PlayNoteA(0.0f);
+                MapManager.musicDirector.PlayNoteA(0.0f);
             }
             else
             {
-                musicDirector.PlayNoteB(0.0f);
+                MapManager.musicDirector.PlayNoteB(0.0f);
             }
         }
 
         public void UpdateHexNumbers()
         {
-            var hexGrid = GameObject.Find("Hex Grid");
-            var hexGridOverlay = GameObject.Find("Hex Grid Overlay");
-            if (hexGrid == null || hexGridOverlay == null)
-            {
-                return;
-            }
-
-            GameObject[,] grid = new GameObject[CoordUtil.Height, CoordUtil.Width];
-            foreach (Transform tr in hexGrid.transform)
-            {
-                int xi = CoordUtil.WorldToGridX(tr.position.x);
-                int yi = CoordUtil.WorldToGridY(tr.position.y);
-                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
-                grid[yi, xi] = tr.gameObject;
-            }
-
-            bool[,] hiddenHexes = new bool[CoordUtil.Height, CoordUtil.Width];
-            foreach (Transform tr in hexGridOverlay.transform)
-            {
-                int xi = CoordUtil.WorldToGridX(tr.position.x);
-                int yi = CoordUtil.WorldToGridY(tr.position.y);
-                if (!CoordUtil.IsValidCoord(xi, yi)) continue;
-
-                // The overlay hex still exists during the reveal animation, and only
-                // gets destroyed after the animation ends. The MeshCollider is disabled
-                // at the start of the animation, so we can use it to check if the hex
-                // is actually revealed.
-                if (tr.GetComponent<MeshCollider>().enabled)
-                {
-                    hiddenHexes[yi, xi] = true;
-                }
-            }
-
             for (int x = 0; x < CoordUtil.Width; x++)
             {
                 for (int y = 0; y < CoordUtil.Height; y++)
                 {
-                    var cell = grid[y, x];
+                    var cell = MapManager.grid[x, y];
                     if (cell == null) continue;
 
                     Coordinate[] coords;
@@ -120,8 +80,8 @@ namespace HexcellsHelper
                         int xi = x + coord.x;
                         int yi = y + coord.y;
                         if (CoordUtil.IsValidCoord(xi, yi)
-                            && grid[yi, xi]?.tag == "Blue"
-                            && (!countRemainingOnly || hiddenHexes[yi, xi]))
+                            && MapManager.grid[xi, yi]?.tag == "Blue"
+                            && (!countRemainingOnly || MapManager.Hidden(xi, yi)))
                         {
                             blueCount++;
                         }
@@ -146,8 +106,15 @@ namespace HexcellsHelper
             {
                 foreach (Transform tr in columnParent.transform)
                 {
-                    int xi = CoordUtil.WorldToGridX(tr.position.x);
-                    int yi = CoordUtil.WorldToGridY(tr.position.y);
+                    var coordinate = CoordUtil.WorldToGrid(tr.position);
+                    var xi = coordinate.x;
+                    var yi = coordinate.y;
+                    switch (tr.name)
+                    {
+                        case "Hello":
+                        default:
+                            break;
+                    }
 
                     Coordinate direction = tr.name switch
                     {
@@ -163,7 +130,7 @@ namespace HexcellsHelper
                         yi += direction.y;
                         if (!CoordUtil.IsValidCoord(xi, yi)) break;
 
-                        if (grid[yi, xi]?.tag == "Blue" && (!countRemainingOnly || hiddenHexes[yi, xi]))
+                        if (MapManager.grid[xi, yi]?.tag == "Blue" && (!countRemainingOnly || MapManager.Hidden(xi, yi)))
                         {
                             blueCount++;
                         }
