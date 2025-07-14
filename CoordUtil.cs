@@ -1,9 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HexcellsHelper
 {
-    public record struct Coordinate(int X, int Y);
+    public record struct Coordinate(int X, int Y)
+    {
+        public static Coordinate operator +(Coordinate a, Coordinate b) =>
+            new(a.X + b.X, a.Y + b.Y);
+    }
+
     public static class CoordUtil
     {
         public const int Width = 33;
@@ -26,7 +32,7 @@ namespace HexcellsHelper
             );
         }
 
-        public static IEnumerable<Coordinate> IterGrid()
+        public static IEnumerable<Coordinate> AllCoords()
         {
             for (int x = 0; x < Width; x++)
             {
@@ -37,41 +43,31 @@ namespace HexcellsHelper
             }
         }
 
-        public static Coordinate[] SurroundCoords(Coordinate coord)
+        public static readonly Coordinate[] SurroundOffsets =
+        [
+            new(0, 2), new(1, 1), new(1, -1), new(0, -2),
+            new(-1, -1), new(-1, 1)
+        ];
+
+        public static readonly Coordinate[] FlowerOffsets =
+        [
+            new(0, 2), new(1, 1), new(1, -1), new(0, -2),
+            new(-1, -1), new(-1, 1), new(0, 4), new(1, 3),
+            new(2, 2), new(2, 0), new(2, -2), new(1, -3),
+            new(0, -4), new(-1, -3), new(-2, -2), new(-2, 0),
+            new(-2, 2), new(-1, 3),
+        ];
+
+        public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
         {
-            return [
-                new(coord.X + 0, coord.Y + 2),
-                new(coord.X + 1, coord.Y + 1),
-                new(coord.X + 1, coord.Y - 1),
-                new(coord.X + 0, coord.Y - 2),
-                new(coord.X + -1, coord.Y - 1),
-                new(coord.X + -1, coord.Y + 1),
-            ];
+            return SurroundOffsets.Select(offset => coord + offset).Where(IsValidCoord);
         }
-        public static Coordinate[] FlowerCoords(Coordinate coord)
+        public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
         {
-            return [
-                new(coord.X + 0, coord.Y + 2),
-                new(coord.X + 1, coord.Y + 1),
-                new(coord.X + 1, coord.Y - 1),
-                new(coord.X + 0, coord.Y - 2),
-                new(coord.X - 1, coord.Y - 1),
-                new(coord.X - 1, coord.Y + 1),
-                new(coord.X + 0, coord.Y + 4),
-                new(coord.X + 1, coord.Y + 3),
-                new(coord.X + 2, coord.Y + 2),
-                new(coord.X + 2, coord.Y + 0),
-                new(coord.X + 2, coord.Y - 2),
-                new(coord.X + 1, coord.Y - 3),
-                new(coord.X + 0, coord.Y - 4),
-                new(coord.X - 1, coord.Y - 3),
-                new(coord.X - 2, coord.Y - 2),
-                new(coord.X - 2, coord.Y + 0),
-                new(coord.X - 2, coord.Y + 2),
-                new(coord.X - 1, coord.Y + 3),
-            ];
+            return FlowerOffsets.Select(offset => coord + offset).Where(IsValidCoord);
         }
-        public static IEnumerable<Coordinate> DiagonalLeftCoord(Coordinate coord)
+
+        public static IEnumerable<Coordinate> DiagonalLeftCoords(Coordinate coord)
         {
             var x = coord.X - 1;
             var y = coord.Y - 1;
@@ -82,7 +78,7 @@ namespace HexcellsHelper
                 y--;
             }
         }
-        public static IEnumerable<Coordinate> DiagonalRightCoord(Coordinate coord)
+        public static IEnumerable<Coordinate> DiagonalRightCoords(Coordinate coord)
         {
             var x = coord.X + 1;
             var y = coord.Y - 1;
@@ -94,7 +90,7 @@ namespace HexcellsHelper
             }
         }
 
-        public static IEnumerable<Coordinate> VerticalCoord(Coordinate coord)
+        public static IEnumerable<Coordinate> VerticalCoords(Coordinate coord)
         {
             var x = coord.X;
             var y = coord.Y - 2;

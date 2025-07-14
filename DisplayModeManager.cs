@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -55,9 +56,17 @@ namespace HexcellsHelper
             UpdateHexNumbers();
         }
 
+        int CountBlueHexesInCoords(IEnumerable<Coordinate> coords)
+        {
+            return coords.Count(coord =>
+                MapManager.GridAt(coord)?.tag == "Blue" &&
+                (!countRemainingOnly || MapManager.IsHidden(coord))
+            );
+        }
+
         public void UpdateHexNumbers()
         {
-            foreach (var coord in CoordUtil.IterGrid())
+            foreach (var coord in CoordUtil.AllCoords())
             {
                 var cell = MapManager.GridAt(coord);
                 if (cell == null)
@@ -65,7 +74,7 @@ namespace HexcellsHelper
                     continue;
                 }
 
-                Coordinate[] otherCoords;
+                IEnumerable<Coordinate> otherCoords;
                 if (cell.tag == "Blue")
                 {
                     // Skip non-flower blue hexes
@@ -82,16 +91,7 @@ namespace HexcellsHelper
                 }
 
                 // Count the number of blue hexes in the surrounding coordinates
-                int blueCount = 0;
-                foreach (var otherCoord in otherCoords)
-                {
-                    if (CoordUtil.IsValidCoord(otherCoord)
-                        && MapManager.GridAt(otherCoord)?.tag == "Blue"
-                        && (!countRemainingOnly || MapManager.IsHidden(otherCoord)))
-                    {
-                        blueCount++;
-                    }
-                }
+                int blueCount = CountBlueHexesInCoords(otherCoords);
 
                 // Update the hex number text
                 string text = blueCount.ToString();
@@ -118,21 +118,12 @@ namespace HexcellsHelper
 
                 IEnumerable<Coordinate> otherCoords = tr.name switch
                 {
-                    "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoord(coord),
-                    "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoord(coord),
-                    _ => CoordUtil.VerticalCoord(coord),
+                    "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
+                    "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
+                    _ => CoordUtil.VerticalCoords(coord),
                 };
 
-                int blueCount = 0;
-
-                foreach (var otherCoord in otherCoords)
-                {
-                    if (MapManager.GridAt(otherCoord)?.tag == "Blue" &&
-                    (!countRemainingOnly || MapManager.IsHidden(otherCoord)))
-                    {
-                        blueCount++;
-                    }
-                }
+                int blueCount = CountBlueHexesInCoords(otherCoords);
 
                 string text = blueCount.ToString();
                 if (tr.tag == "Column Sequential")

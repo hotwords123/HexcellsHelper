@@ -39,7 +39,7 @@ namespace HexcellsHelper
                 }
             }
 
-            foreach (var coord in CoordUtil.IterGrid())
+            foreach (var coord in CoordUtil.AllCoords())
             {
                 var cell = MapManager.GridAt(coord);
                 if (cell == null)

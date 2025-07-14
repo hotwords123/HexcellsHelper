@@ -18,7 +18,7 @@ namespace HexcellsHelper
 
         bool SolveTrivial()
         {
-            foreach (var coord in CoordUtil.IterGrid())
+            foreach (var coord in CoordUtil.AllCoords())
             {
                 // can only solve if the cell is not hidden
                 if (MapManager.IsHidden(coord))
@@ -129,7 +129,7 @@ namespace HexcellsHelper
             {
                 return false;
             }
-            
+
             if (cell.tag.StartsWith("Clue Hex (Sequential)"))
             {
 
@@ -165,9 +165,9 @@ namespace HexcellsHelper
             var coord = CoordUtil.WorldToGrid(tr.position);
             IEnumerable<Coordinate> otherCoords = tr.name switch
             {
-                "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoord(coord),
-                "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoord(coord),
-                _ => CoordUtil.VerticalCoord(coord),
+                "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
+                "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
+                _ => CoordUtil.VerticalCoords(coord),
             };
             var reallyTrivialSuccess = TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue);
             if (reallyTrivialSuccess || hiddenBlack == 0 && hiddenBlue == 0)
