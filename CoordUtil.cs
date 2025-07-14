@@ -58,47 +58,41 @@ namespace HexcellsHelper
             new(-2, 2), new(-1, 3),
         ];
 
+        public static IEnumerable<Coordinate> OffsetCoords(Coordinate coord, IEnumerable<Coordinate> offsets)
+        {
+            return offsets.Select(offset => coord + offset);
+        }
+
         public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
         {
-            return SurroundOffsets.Select(offset => coord + offset);
+            return OffsetCoords(coord, SurroundOffsets);
         }
         public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
         {
-            return FlowerOffsets.Select(offset => coord + offset);
+            return OffsetCoords(coord, FlowerOffsets);
+        }
+
+        public static IEnumerable<Coordinate> ColumnCoords(Coordinate coord, Coordinate direction)
+        {
+            coord += direction;
+            while (IsValidCoord(coord))
+            {
+                yield return coord;
+                coord += direction;
+            }
         }
 
         public static IEnumerable<Coordinate> DiagonalLeftCoords(Coordinate coord)
         {
-            var x = coord.X - 1;
-            var y = coord.Y - 1;
-            while (IsValidCoord(x, y))
-            {
-                yield return new(x, y);
-                x--;
-                y--;
-            }
+            return ColumnCoords(coord, new Coordinate(-1, -1));
         }
         public static IEnumerable<Coordinate> DiagonalRightCoords(Coordinate coord)
         {
-            var x = coord.X + 1;
-            var y = coord.Y - 1;
-            while (IsValidCoord(x, y))
-            {
-                yield return new(x, y);
-                x++;
-                y--;
-            }
+            return ColumnCoords(coord, new Coordinate(1, -1));
         }
-
         public static IEnumerable<Coordinate> VerticalCoords(Coordinate coord)
         {
-            var x = coord.X;
-            var y = coord.Y - 2;
-            while (IsValidCoord(x, y))
-            {
-                yield return new(x, y);
-                y -= 2;
-            }
+            return ColumnCoords(coord, new Coordinate(0, -2));
         }
     }
 }
