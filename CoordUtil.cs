@@ -37,35 +37,39 @@ namespace HexcellsHelper
             }
         }
 
-        public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
+        public static Coordinate[] SurroundCoords(Coordinate coord)
         {
-            yield return new(coord.X + 0, coord.Y + 2);
-            yield return new(coord.X + 1, coord.Y + 1);
-            yield return new(coord.X + 1, coord.Y - 1);
-            yield return new(coord.X + 0, coord.Y - 2);
-            yield return new(coord.X + -1, coord.Y - 1);
-            yield return new(coord.X + -1, coord.Y + 1);
+            return [
+                new(coord.X + 0, coord.Y + 2),
+                new(coord.X + 1, coord.Y + 1),
+                new(coord.X + 1, coord.Y - 1),
+                new(coord.X + 0, coord.Y - 2),
+                new(coord.X + -1, coord.Y - 1),
+                new(coord.X + -1, coord.Y + 1),
+            ];
         }
-        public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
+        public static Coordinate[] FlowerCoords(Coordinate coord)
         {
-            yield return new(coord.X + 0, coord.Y + 2);
-            yield return new(coord.X + 1, coord.Y + 1);
-            yield return new(coord.X + 1, coord.Y - 1);
-            yield return new(coord.X + 0, coord.Y - 2);
-            yield return new(coord.X - 1, coord.Y - 1);
-            yield return new(coord.X - 1, coord.Y + 1);
-            yield return new(coord.X + 0, coord.Y + 4);
-            yield return new(coord.X + 1, coord.Y + 3);
-            yield return new(coord.X + 2, coord.Y + 2);
-            yield return new(coord.X + 2, coord.Y + 0);
-            yield return new(coord.X + 2, coord.Y - 2);
-            yield return new(coord.X + 1, coord.Y - 3);
-            yield return new(coord.X + 0, coord.Y - 4);
-            yield return new(coord.X - 1, coord.Y - 3);
-            yield return new(coord.X - 2, coord.Y - 2);
-            yield return new(coord.X - 2, coord.Y + 0);
-            yield return new(coord.X - 2, coord.Y + 2);
-            yield return new(coord.X - 1, coord.Y + 3);
+            return [
+                new(coord.X + 0, coord.Y + 2),
+                new(coord.X + 1, coord.Y + 1),
+                new(coord.X + 1, coord.Y - 1),
+                new(coord.X + 0, coord.Y - 2),
+                new(coord.X - 1, coord.Y - 1),
+                new(coord.X - 1, coord.Y + 1),
+                new(coord.X + 0, coord.Y + 4),
+                new(coord.X + 1, coord.Y + 3),
+                new(coord.X + 2, coord.Y + 2),
+                new(coord.X + 2, coord.Y + 0),
+                new(coord.X + 2, coord.Y - 2),
+                new(coord.X + 1, coord.Y - 3),
+                new(coord.X + 0, coord.Y - 4),
+                new(coord.X - 1, coord.Y - 3),
+                new(coord.X - 2, coord.Y - 2),
+                new(coord.X - 2, coord.Y + 0),
+                new(coord.X - 2, coord.Y + 2),
+                new(coord.X - 1, coord.Y + 3),
+            ];
         }
         public static IEnumerable<Coordinate> DiagonalLeftCoord(Coordinate coord)
         {

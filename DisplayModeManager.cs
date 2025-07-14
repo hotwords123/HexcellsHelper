@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace HexcellsHelper
 {
@@ -66,7 +65,7 @@ namespace HexcellsHelper
                     continue;
                 }
 
-                IEnumerable<Coordinate> otherCoords;
+                Coordinate[] otherCoords;
                 if (cell.tag == "Blue")
                 {
                     // Skip non-flower blue hexes
