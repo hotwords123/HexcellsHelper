@@ -16,7 +16,7 @@ namespace HexcellsHelper
                 if (string.IsNullOrEmpty(levelText))
                 {
                     Debug.LogError("[LevelDumper] Failed to serialize the current level.");
-                    MapManager.musicDirector.PlayWrongNote(0.0f);
+                    GameObjectUtil.GetMusicDirector().PlayWrongNote(0.0f);
                     return;
                 }
 
@@ -24,7 +24,7 @@ namespace HexcellsHelper
                 Debug.Log($"[LevelDumper] Level text copied to clipboard");
 
                 // Play a sound to indicate success
-                GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>().PlayNoteB(0.0f);
+                GameObjectUtil.GetMusicDirector().PlayNoteB(0.0f);
             }
         }
 
@@ -78,7 +78,7 @@ namespace HexcellsHelper
                 grid[coord.X * 2 + 1, coord.Y] = info;
             }
 
-            foreach (Transform tr in GameObject.Find("Columns Parent").transform)
+            foreach (Transform tr in MapManager.ColumnsParent.transform)
             {
                 var coord = CoordUtil.WorldToGrid(tr.position);
 
@@ -101,7 +101,7 @@ namespace HexcellsHelper
             }
 
             var sb = new StringBuilder();
-            string seed = GameObject.Find("Game Manager(Clone)").GetComponent<GameManagerScript>().seedNumber;
+            string seed = GameObjectUtil.GetGameManager().seedNumber;
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             sb.AppendLine(Header);
             sb.AppendLine($"Seed {seed}");  // title

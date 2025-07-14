@@ -12,7 +12,7 @@ namespace HexcellsHelper
             {
                 if (!SolveTrivial())
                 {
-                    MapManager.musicDirector.PlayWrongNote(0.0f);
+                    GameObjectUtil.GetMusicDirector().PlayWrongNote(0.0f);
                 }
             }
         }
@@ -51,12 +51,11 @@ namespace HexcellsHelper
             }
 
             // now try to solve columns
-            var columnParent = GameObject.Find("Columns Parent");
-            if (columnParent == null)
+            if (MapManager.ColumnsParent == null)
             {
                 return false;
             }
-            foreach (Transform tr in columnParent.transform)
+            foreach (Transform tr in MapManager.ColumnsParent.transform)
             {
                 if (TrySolveColumn(tr))
                 {

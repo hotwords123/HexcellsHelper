@@ -20,8 +20,8 @@ namespace HexcellsHelper {
 
         public static void OnLevelLoaded()
         {
-            var hexGrid = GameObject.Find("Hex Grid");
-            var hexGridOverlay = GameObject.Find("Hex Grid Overlay");
+            var hexGrid = GameObjectUtil.GetHexGrid();
+            var hexGridOverlay = GameObjectUtil.GetHexGridOverlay();
             if (hexGrid == null || hexGridOverlay == null)
             {
                 return;

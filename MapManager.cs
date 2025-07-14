@@ -5,14 +5,16 @@ namespace HexcellsHelper
 
     public static class MapManager
     {
-        public static GameObject[,] grid;
-        public static GameObject[,] gridOverlay;
-        public static MusicDirector musicDirector;
+        static GameObject[,] grid;
+        static GameObject[,] gridOverlay;
         static GameObject hexGrid;
         static GameObject hexGridOverlay;
+        static GameObject columnsParent;
         static EditorFunctions editorFunctions;
         static HexScoring score;
         static TextMesh remainingText;
+
+        public static GameObject ColumnsParent => columnsParent;
 
         public static void Init()
         {
@@ -86,19 +88,19 @@ namespace HexcellsHelper
             }
 
             score.tilesRemoved--;
-            musicDirector.PlayWrongNote(overlayCell.transform.position.x / 7.04f);
+            GameObjectUtil.GetMusicDirector().PlayWrongNote(overlayCell.transform.position.x / 7.04f);
             iTween.ShakePosition(overlayCell, new Vector3(0.1f, 0.1f, 0f), 0.3f);
             return true;
         }
 
         static void InitializeMap()
         {
-            hexGrid = GameObject.Find("Hex Grid");
-            hexGridOverlay = GameObject.Find("Hex Grid Overlay");
+            hexGrid = GameObjectUtil.GetHexGrid();
+            hexGridOverlay = GameObjectUtil.GetHexGridOverlay();
+            columnsParent = GameObject.Find("Columns Parent");
             editorFunctions = GameObject.Find("Editor Functions").GetComponent<EditorFunctions>();
             score = GameObject.Find("Score Text").GetComponent<HexScoring>();
             remainingText = score.GetComponent<TextMesh>();
-            musicDirector = GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>();
 
             grid = new GameObject[CoordUtil.Width, CoordUtil.Height];
             foreach (Transform tr in hexGrid.transform)

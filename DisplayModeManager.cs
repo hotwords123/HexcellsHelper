@@ -42,11 +42,11 @@ namespace HexcellsHelper
 
             if (countRemainingOnly)
             {
-                MapManager.musicDirector.PlayNoteA(0.0f);
+                GameObjectUtil.GetMusicDirector().PlayNoteA(0.0f);
             }
             else
             {
-                MapManager.musicDirector.PlayNoteB(0.0f);
+                GameObjectUtil.GetMusicDirector().PlayNoteB(0.0f);
             }
         }
 
@@ -106,13 +106,11 @@ namespace HexcellsHelper
                 cell.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
             }
 
-
-            var columnParent = GameObject.Find("Columns Parent");
-            if (columnParent == null)
+            if (MapManager.ColumnsParent == null)
             {
                 return;
             }
-            foreach (Transform tr in columnParent.transform)
+            foreach (Transform tr in MapManager.ColumnsParent.transform)
             {
                 var coord = CoordUtil.WorldToGrid(tr.position);
 
