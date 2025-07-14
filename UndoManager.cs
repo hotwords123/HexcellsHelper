@@ -19,18 +19,18 @@ namespace HexcellsHelper
         void OnEnable()
         {
             EventManager.LevelLoaded += undoStack.Clear;
-            EventManager.DestroyClicked += AddAction;
-            EventManager.HighlightClicked += AddAction;
+            EventManager.DestroyClicked += OnHexRevealed;
+            EventManager.HighlightClicked += OnHexRevealed;
         }
 
         void OnDisable()
         {
             EventManager.LevelLoaded -= undoStack.Clear;
-            EventManager.DestroyClicked -= AddAction;
-            EventManager.HighlightClicked -= AddAction;
+            EventManager.DestroyClicked -= OnHexRevealed;
+            EventManager.HighlightClicked -= OnHexRevealed;
         }
 
-        void AddAction(HexBehaviour hexBehaviour)
+        void OnHexRevealed(HexBehaviour hexBehaviour)
         {
             undoStack.Push(CoordUtil.WorldToGrid(hexBehaviour.transform.position));
         }

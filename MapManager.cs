@@ -19,8 +19,8 @@ namespace HexcellsHelper
         public static void Init()
         {
             EventManager.LevelLoaded += InitializeMap;
-            EventManager.DestroyClicked += UpdateMap;
-            EventManager.HighlightClicked += UpdateMap;
+            EventManager.DestroyClicked += OnHexRevealed;
+            EventManager.HighlightClicked += OnHexRevealed;
         }
 
         public static bool IsNonEmpty(Coordinate coord)
@@ -130,7 +130,7 @@ namespace HexcellsHelper
             }
         }
 
-        static void UpdateMap(HexBehaviour hexBehaviour)
+        static void OnHexRevealed(HexBehaviour hexBehaviour)
         {
             if (hexBehaviour == null)
             {

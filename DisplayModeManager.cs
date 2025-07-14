@@ -25,14 +25,14 @@ namespace HexcellsHelper
 
         void OnEnable()
         {
-            EventManager.LevelLoaded += UpdateHexNumbers;
-            EventManager.HighlightClicked += UpdateHexNumbers;
+            EventManager.LevelLoaded += OnLevelLoaded;
+            EventManager.HighlightClicked += OnHighlightClicked;
         }
 
         void OnDisable()
         {
-            EventManager.LevelLoaded -= UpdateHexNumbers;
-            EventManager.HighlightClicked -= UpdateHexNumbers;
+            EventManager.LevelLoaded -= OnLevelLoaded;
+            EventManager.HighlightClicked -= OnHighlightClicked;
         }
 
         void ToggleDisplayMode()
@@ -50,13 +50,18 @@ namespace HexcellsHelper
             }
         }
 
-        void UpdateHexNumbers(HexBehaviour hexBehaviour)
+        void OnLevelLoaded()
         {
-            // Update hex numbers based on the current display mode
             UpdateHexNumbers();
         }
 
-        int CountBlueHexesInCoords(IEnumerable<Coordinate> coords)
+        void OnHighlightClicked(HexBehaviour hexBehaviour)
+        {
+            // Update hex numbers when a hex is highlighted
+            UpdateHexNumbers();
+        }
+
+        int CalculateNumberForCoords(IEnumerable<Coordinate> coords)
         {
             return coords.Count(coord =>
                 MapManager.GridAt(coord)?.tag == "Blue" &&
@@ -91,7 +96,7 @@ namespace HexcellsHelper
                 }
 
                 // Count the number of blue hexes in the surrounding coordinates
-                int blueCount = CountBlueHexesInCoords(otherCoords);
+                int blueCount = CalculateNumberForCoords(otherCoords);
 
                 // Update the hex number text
                 string text = blueCount.ToString();
@@ -121,7 +126,7 @@ namespace HexcellsHelper
                     _ => CoordUtil.VerticalCoords(coord),
                 };
 
-                int blueCount = CountBlueHexesInCoords(otherCoords);
+                int blueCount = CalculateNumberForCoords(otherCoords);
 
                 string text = blueCount.ToString();
                 if (tr.tag == "Column Sequential")
