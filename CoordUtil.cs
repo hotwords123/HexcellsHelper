@@ -60,11 +60,11 @@ namespace HexcellsHelper
 
         public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
         {
-            return SurroundOffsets.Select(offset => coord + offset).Where(IsValidCoord);
+            return SurroundOffsets.Select(offset => coord + offset);
         }
         public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
         {
-            return FlowerOffsets.Select(offset => coord + offset).Where(IsValidCoord);
+            return FlowerOffsets.Select(offset => coord + offset);
         }
 
         public static IEnumerable<Coordinate> DiagonalLeftCoords(Coordinate coord)

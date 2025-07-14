@@ -23,6 +23,11 @@ namespace HexcellsHelper
             EventManager.HighlightClicked += UpdateMap;
         }
 
+        public static bool IsNonEmpty(Coordinate coord)
+        {
+            return GridAt(coord) != null;
+        }
+
         public static bool IsHidden(Coordinate coord)
         {
             return GridOverlayAt(coord) != null;
