@@ -39,7 +39,7 @@ namespace HexcellsHelper
         {
             if (undoStack.Count > 0)
             {
-                MapManager.SetYellow(undoStack.Pop());
+                MapManager.SetHidden(undoStack.Pop());
             }
         }
     }

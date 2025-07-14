@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.SceneManagement;
 
 namespace HexcellsHelper
 {
@@ -66,7 +64,7 @@ namespace HexcellsHelper
             SetBlue(coord.X, coord.Y);
         }
 
-        public static bool SetYellow(int x, int y)
+        public static bool SetHidden(int x, int y)
         {
             if (grid[x, y] == null || gridOverlay[x, y] != null)
             {
@@ -93,9 +91,9 @@ namespace HexcellsHelper
             return true;
         }
 
-        public static bool SetYellow(Coordinate coord)
+        public static bool SetHidden(Coordinate coord)
         {
-            return SetYellow(coord.X, coord.Y);
+            return SetHidden(coord.X, coord.Y);
         }
 
         static void InitializeMap()
