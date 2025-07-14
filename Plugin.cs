@@ -21,6 +21,9 @@ namespace HexcellsHelper
             BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<DisplayModeManager>();
             Logger.LogInfo("DisplayModeManager component added to GameManager.");
 
+            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<TrivialSolver>();
+            Logger.LogInfo("TrivialSolver component added to GameManager.");
+
             HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
 
