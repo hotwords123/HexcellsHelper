@@ -39,11 +39,13 @@ namespace HexcellsHelper
                         return true;
                     }
                 }
-
-                // now it must be a black cell
-                else if (cell.tag != "Clue Hex Blank" && TrySolveBlack(cell))
+                else
                 {
-                    return true;
+                    // now it must be a black cell
+                    if (cell.tag != "Clue Hex Blank" && TrySolveBlack(cell))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -69,7 +71,7 @@ namespace HexcellsHelper
             hiddenBlue = 0;
             foreach (var otherCoord in coords)
             {
-                if (!CoordUtil.IsValidCoord(otherCoord) || !MapManager.IsHidden(otherCoord))
+                if (!MapManager.IsHidden(otherCoord))
                 {
                     continue;
                 }
@@ -92,7 +94,7 @@ namespace HexcellsHelper
                 // all hidden cells are blue, we can solve it
                 foreach (var otherCoord in coords)
                 {
-                    if (CoordUtil.IsValidCoord(otherCoord) && MapManager.IsHidden(otherCoord))
+                    if (MapManager.IsHidden(otherCoord))
                     {
                         MapManager.SetBlue(otherCoord);
                     }
@@ -104,7 +106,7 @@ namespace HexcellsHelper
                 // all hidden cells are black, we can solve it
                 foreach (var otherCoord in coords)
                 {
-                    if (CoordUtil.IsValidCoord(otherCoord) && MapManager.IsHidden(otherCoord))
+                    if (MapManager.IsHidden(otherCoord))
                     {
                         MapManager.SetBlack(otherCoord);
                     }
@@ -148,9 +150,9 @@ namespace HexcellsHelper
             var otherCoords = CoordUtil.FlowerCoords(coord);
             // no non-really-trivial solving for flower
             var reallyTrivialSuccess = TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue);
-            if (reallyTrivialSuccess || hiddenBlack == 0 && hiddenBlue == 0)
+            if (hiddenBlack == 0 || hiddenBlue == 0)
             {
-                // unlight the flower
+                // mark the flower as complete
                 var flower = cell.GetComponent<BlueHexFlower>();
                 if (!flower.playerHasMarkedComplete)
                 {
@@ -170,18 +172,18 @@ namespace HexcellsHelper
                 _ => CoordUtil.VerticalCoords(coord),
             };
             var reallyTrivialSuccess = TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue);
-            if (reallyTrivialSuccess || hiddenBlack == 0 && hiddenBlue == 0)
+            if (hiddenBlack == 0 || hiddenBlue == 0)
             {
-                // unlight the column
+                // mark the column as complete
                 var column = tr.GetComponent<ColumnNumber>();
                 if (!column.playerHasMarkedComplete)
                 {
                     column.ToggleMarkComplete();
                 }
-                if (reallyTrivialSuccess)
-                {
-                    return true;
-                }
+            }
+            if (reallyTrivialSuccess)
+            {
+                return true;
             }
             // try use sequential and NOT sequential if provided
             if (tr.tag == "Column Number")

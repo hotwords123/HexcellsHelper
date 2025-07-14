@@ -44,7 +44,7 @@ namespace HexcellsHelper
         {
             // No need to update gridOverlay.
             // Because UpdateMap is registered when DestroyClick is called.
-            gridOverlay[x, y]?.transform.GetComponent<HexBehaviour>().DestroyClick();
+            gridOverlay[x, y]?.GetComponent<HexBehaviour>().DestroyClick();
         }
 
         public static void SetBlack(Coordinate coord)
@@ -56,7 +56,7 @@ namespace HexcellsHelper
         {
             // No need to update gridOverlay.
             // Because UpdateMap is registered when HighlightClick is called.
-            gridOverlay[x, y]?.transform.GetComponent<HexBehaviour>().HighlightClick();
+            gridOverlay[x, y]?.GetComponent<HexBehaviour>().HighlightClick();
         }
 
         public static void SetBlue(Coordinate coord)
@@ -138,7 +138,5 @@ namespace HexcellsHelper
             var coord = CoordUtil.WorldToGrid(position);
             gridOverlay[coord.X, coord.Y] = null;
         }
-
-
     }
 }
