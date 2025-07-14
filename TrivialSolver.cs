@@ -128,7 +128,6 @@ namespace HexcellsHelper
             if (!cell.tag.StartsWith("Clue Hex ("))
             {
                 return false;
-
             }
             
             if (cell.tag.StartsWith("Clue Hex (Sequential)"))
@@ -148,7 +147,17 @@ namespace HexcellsHelper
             var coord = CoordUtil.WorldToGrid(cell.transform.position);
             var otherCoords = CoordUtil.FlowerCoords(coord);
             // no non-really-trivial solving for flower
-            return TrySolveReallyTrivial(otherCoords, out _, out _);
+            var reallyTrivialSuccess = TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue);
+            if (reallyTrivialSuccess || hiddenBlack == 0 && hiddenBlue == 0)
+            {
+                // unlight the flower
+                var flower = cell.GetComponent<BlueHexFlower>();
+                if (!flower.playerHasMarkedComplete)
+                {
+                    flower.ToggleMarkComplete();
+                }
+            }
+            return reallyTrivialSuccess;
         }
 
         bool TrySolveColumn(Transform tr)
@@ -160,9 +169,19 @@ namespace HexcellsHelper
                 "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoord(coord),
                 _ => CoordUtil.VerticalCoord(coord),
             };
-            if (TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue))
+            var reallyTrivialSuccess = TrySolveReallyTrivial(otherCoords, out int hiddenBlack, out int hiddenBlue);
+            if (reallyTrivialSuccess || hiddenBlack == 0 && hiddenBlue == 0)
             {
-                return true;
+                // unlight the column
+                var column = tr.GetComponent<ColumnNumber>();
+                if (!column.playerHasMarkedComplete)
+                {
+                    column.ToggleMarkComplete();
+                }
+                if (reallyTrivialSuccess)
+                {
+                    return true;
+                }
             }
             // try use sequential and NOT sequential if provided
             if (tr.tag == "Column Number")
