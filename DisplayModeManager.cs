@@ -83,11 +83,11 @@ namespace HexcellsHelper
 
                 // Count the number of blue hexes in the surrounding coordinates
                 int blueCount = 0;
-                foreach (var othercoord in otherCoords)
+                foreach (var otherCoord in otherCoords)
                 {
-                    if (CoordUtil.IsValidCoord(othercoord)
-                        && MapManager.GridAt(othercoord)?.tag == "Blue"
-                        && (!countRemainingOnly || MapManager.IsHidden(othercoord)))
+                    if (CoordUtil.IsValidCoord(otherCoord)
+                        && MapManager.GridAt(otherCoord)?.tag == "Blue"
+                        && (!countRemainingOnly || MapManager.IsHidden(otherCoord)))
                     {
                         blueCount++;
                     }
@@ -125,10 +125,10 @@ namespace HexcellsHelper
 
                 int blueCount = 0;
 
-                foreach (var othercoord in otherCoords)
+                foreach (var otherCoord in otherCoords)
                 {
-                    if (MapManager.GridAt(othercoord)?.tag == "Blue" &&
-                    (!countRemainingOnly || MapManager.IsHidden(othercoord)))
+                    if (MapManager.GridAt(otherCoord)?.tag == "Blue" &&
+                    (!countRemainingOnly || MapManager.IsHidden(otherCoord)))
                     {
                         blueCount++;
                     }
