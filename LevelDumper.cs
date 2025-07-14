@@ -78,17 +78,17 @@ namespace HexcellsHelper
                 grid[coord.X * 2 + 1, coord.Y] = info;
             }
 
-            foreach (Transform tr in MapManager.ColumnsParent.transform)
+            foreach (var column in MapManager.Columns)
             {
-                var coord = CoordUtil.WorldToGrid(tr.position);
+                var coord = CoordUtil.WorldToGrid(column.transform.position);
 
-                char kind = tr.name switch
+                char kind = column.name switch
                 {
                     "Column Number Diagonal Right" => '\\',
                     "Column Number Diagonal Left" => '/',
                     _ => '|',
                 };
-                char info = tr.tag switch
+                char info = column.tag switch
                 {
                     "Column Sequential" => 'c',
                     "Column NOT Sequential" => 'n',

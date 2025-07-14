@@ -55,16 +55,12 @@ namespace HexcellsHelper
             }
 
             // now try to solve columns
-            if (MapManager.ColumnsParent == null)
+            foreach (var column in MapManager.Columns)
             {
-                return false;
-            }
-            foreach (Transform tr in MapManager.ColumnsParent.transform)
-            {
-                if (TrySolveColumn(tr))
+                if (TrySolveColumn(column))
                 {
-                    Debug.Log("Solved column at " + CoordUtil.WorldToGrid(tr.position));
-                    iTween.ShakePosition(tr.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+                    Debug.Log("Solved column at " + CoordUtil.WorldToGrid(column.transform.position));
+                    iTween.ShakePosition(column, new Vector3(0.1f, 0.1f, 0f), 0.3f);
                     return true;
                 }
             }
@@ -166,10 +162,10 @@ namespace HexcellsHelper
             return reallyTrivialSuccess;
         }
 
-        bool TrySolveColumn(Transform tr)
+        bool TrySolveColumn(GameObject column)
         {
-            var coord = CoordUtil.WorldToGrid(tr.position);
-            IEnumerable<Coordinate> otherCoords = tr.name switch
+            var coord = CoordUtil.WorldToGrid(column.transform.position);
+            IEnumerable<Coordinate> otherCoords = column.name switch
             {
                 "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
                 "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
@@ -179,10 +175,10 @@ namespace HexcellsHelper
             if (hiddenBlack == 0 || hiddenBlue == 0)
             {
                 // mark the column as complete
-                var column = tr.GetComponent<ColumnNumber>();
-                if (!column.playerHasMarkedComplete)
+                var columnNumber = column.GetComponent<ColumnNumber>();
+                if (!columnNumber.playerHasMarkedComplete)
                 {
-                    column.ToggleMarkComplete();
+                    columnNumber.ToggleMarkComplete();
                 }
             }
             if (reallyTrivialSuccess)
@@ -192,11 +188,11 @@ namespace HexcellsHelper
 
             // try use sequential and NOT sequential if provided
             bool consecutive;
-            if (tr.tag == "Column Sequential")
+            if (column.tag == "Column Sequential")
             {
                 consecutive = true;
             }
-            else if (tr.tag == "Column NOT Sequential")
+            else if (column.tag == "Column NOT Sequential")
             {
                 consecutive = false;
             }

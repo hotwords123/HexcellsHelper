@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 
 namespace HexcellsHelper
 {
@@ -7,6 +8,7 @@ namespace HexcellsHelper
     {
         static GameObject[,] grid;
         static GameObject[,] gridOverlay;
+        static GameObject[] columnNumbers;
         static GameObject hexGrid;
         static GameObject hexGridOverlay;
         static GameObject columnsParent;
@@ -14,7 +16,7 @@ namespace HexcellsHelper
         static HexScoring score;
         static TextMesh remainingText;
 
-        public static GameObject ColumnsParent => columnsParent;
+        public static GameObject[] Columns => columnNumbers;
 
         public static void Init()
         {
@@ -128,6 +130,11 @@ namespace HexcellsHelper
                 }
                 gridOverlay[coord.X, coord.Y] = tr.gameObject;
             }
+
+            columnNumbers = columnsParent.transform
+                .Cast<Transform>()
+                .Select(tr => tr.gameObject)
+                .ToArray();
         }
 
         static void OnHexRevealed(HexBehaviour hexBehaviour)

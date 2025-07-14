@@ -111,15 +111,11 @@ namespace HexcellsHelper
                 cell.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
             }
 
-            if (MapManager.ColumnsParent == null)
+            foreach (var column in MapManager.Columns)
             {
-                return;
-            }
-            foreach (Transform tr in MapManager.ColumnsParent.transform)
-            {
-                var coord = CoordUtil.WorldToGrid(tr.position);
+                var coord = CoordUtil.WorldToGrid(column.transform.position);
 
-                IEnumerable<Coordinate> otherCoords = tr.name switch
+                IEnumerable<Coordinate> otherCoords = column.name switch
                 {
                     "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
                     "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
@@ -129,15 +125,15 @@ namespace HexcellsHelper
                 int blueCount = CalculateNumberForCoords(otherCoords);
 
                 string text = blueCount.ToString();
-                if (tr.tag == "Column Sequential")
+                if (column.tag == "Column Sequential")
                 {
                     text = "{" + text + "}";
                 }
-                else if (tr.tag == "Column NOT Sequential")
+                else if (column.tag == "Column NOT Sequential")
                 {
                     text = "-" + text + "-";
                 }
-                tr.GetComponent<TextMesh>().text = text;
+                column.GetComponent<TextMesh>().text = text;
             }
         }
     }
