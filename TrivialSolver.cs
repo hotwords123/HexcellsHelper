@@ -92,7 +92,7 @@ namespace HexcellsHelper
                 // all hidden cells are blue, we can solve it
                 foreach (var otherCoord in coords)
                 {
-                    if (MapManager.IsHidden(otherCoord))
+                    if (CoordUtil.IsValidCoord(otherCoord) && MapManager.IsHidden(otherCoord))
                     {
                         MapManager.SetBlue(otherCoord);
                     }
@@ -104,7 +104,7 @@ namespace HexcellsHelper
                 // all hidden cells are black, we can solve it
                 foreach (var otherCoord in coords)
                 {
-                    if (MapManager.IsHidden(otherCoord))
+                    if (CoordUtil.IsValidCoord(otherCoord) && MapManager.IsHidden(otherCoord))
                     {
                         MapManager.SetBlack(otherCoord);
                     }
