@@ -21,79 +21,74 @@ namespace HexcellsHelper
             EventManager.HighlightClicked += UpdateMap;
         }
 
-        public static bool IsHidden(int x, int y)
-        {
-            return gridOverlay[x, y] != null;
-        }
         public static bool IsHidden(Coordinate coord)
         {
-            return IsHidden(coord.X, coord.Y);
+            return GridOverlayAt(coord) != null;
         }
 
         public static GameObject GridAt(Coordinate coord)
         {
+            if (!CoordUtil.IsValidCoord(coord))
+            {
+                return null;
+            }
             return grid[coord.X, coord.Y];
         }
 
         public static GameObject GridOverlayAt(Coordinate coord)
         {
+            if (!CoordUtil.IsValidCoord(coord))
+            {
+                return null;
+            }
             return gridOverlay[coord.X, coord.Y];
-        }
-
-        public static void SetBlack(int x, int y)
-        {
-            // No need to update gridOverlay.
-            // Because UpdateMap is registered when DestroyClick is called.
-            gridOverlay[x, y]?.GetComponent<HexBehaviour>().DestroyClick();
         }
 
         public static void SetBlack(Coordinate coord)
         {
-            SetBlack(coord.X, coord.Y);
-        }
-
-        public static void SetBlue(int x, int y)
-        {
             // No need to update gridOverlay.
-            // Because UpdateMap is registered when HighlightClick is called.
-            gridOverlay[x, y]?.GetComponent<HexBehaviour>().HighlightClick();
+            // Because UpdateMap is registered when DestroyClick is called.
+            GridOverlayAt(coord)?.GetComponent<HexBehaviour>().DestroyClick();
         }
 
         public static void SetBlue(Coordinate coord)
         {
-            SetBlue(coord.X, coord.Y);
+            // No need to update gridOverlay.
+            // Because UpdateMap is registered when HighlightClick is called.
+            GridOverlayAt(coord)?.GetComponent<HexBehaviour>().HighlightClick();
         }
 
-        public static bool SetHidden(int x, int y)
+        public static bool SetHidden(Coordinate coord)
         {
-            if (grid[x, y] == null || gridOverlay[x, y] != null)
+            var cell = GridAt(coord);
+            var overlayCell = GridOverlayAt(coord);
+            if (cell == null || overlayCell != null)
             {
                 return false;
             }
-            gridOverlay[x, y] = Object.Instantiate(
+
+            overlayCell = Object.Instantiate(
                 editorFunctions.orangeHex,
-                grid[x, y].transform.position,
+                cell.transform.position,
                 editorFunctions.orangeHex.transform.rotation,
                 hexGridOverlay.transform
             );
-            if (grid[x, y].tag == "Blue")
+            gridOverlay[coord.X, coord.Y] = overlayCell;
+
+            if (cell.tag == "Blue")
             {
                 score.numberOfCorrectTilesFound--;
-                gridOverlay[x, y].GetComponent<HexBehaviour>().containsShapeBlock = true;
+                overlayCell.GetComponent<HexBehaviour>().containsShapeBlock = true;
                 remainingText.text = (score.numberOfBlueTiles - score.numberOfCorrectTilesFound).ToString();
                 BepInEx.Bootstrap.Chainloader.ManagerObject
                     .GetComponent<DisplayModeManager>()
                     .UpdateHexNumbers();
             }
-            score.tilesRemoved--;
-            musicDirector.PlayWrongNote(gridOverlay[x, y].transform.position.x / 7.04f);
-            iTween.ShakePosition(gridOverlay[x, y], new Vector3(0.1f, 0.1f, 0f), 0.3f);
-            return true;
-        }
 
-        public static bool SetHidden(Coordinate coord)
-        {
-            return SetHidden(coord.X, coord.Y);
+            score.tilesRemoved--;
+            musicDirector.PlayWrongNote(overlayCell.transform.position.x / 7.04f);
+            iTween.ShakePosition(overlayCell, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+            return true;
         }
 
         static void InitializeMap()
