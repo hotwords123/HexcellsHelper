@@ -37,6 +37,8 @@ namespace HexcellsHelper
                 {
                     if (cell.name == "Blue Hex (Flower)" && TrySolveFlower(cell))
                     {
+                        Debug.Log("Solved flower at " + coord);
+                        iTween.ShakePosition(cell, new Vector3(0.1f, 0.1f, 0f), 0.3f);
                         return true;
                     }
                 }
@@ -45,6 +47,8 @@ namespace HexcellsHelper
                     // now it must be a black cell
                     if (cell.tag != "Clue Hex Blank" && TrySolveBlack(cell))
                     {
+                        Debug.Log("Solved black cell at " + coord);
+                        iTween.ShakePosition(cell, new Vector3(0.1f, 0.1f, 0f), 0.3f);
                         return true;
                     }
                 }
@@ -59,6 +63,8 @@ namespace HexcellsHelper
             {
                 if (TrySolveColumn(tr))
                 {
+                    Debug.Log("Solved column at " + CoordUtil.WorldToGrid(tr.position));
+                    iTween.ShakePosition(tr.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
                     return true;
                 }
             }
