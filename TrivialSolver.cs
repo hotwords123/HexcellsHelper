@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -62,7 +63,10 @@ namespace HexcellsHelper
                     return true;
                 }
             }
-            return false;
+
+            // now try to solve using the remaining cells
+            var remainingCells = CoordUtil.AllCoords().Where(MapManager.IsHidden);
+            return TrySolveReallyTrivial(remainingCells, out int hiddenBlack, out int hiddenBlue);
         }
 
         bool TrySolveReallyTrivial(IEnumerable<Coordinate> coords, out int hiddenBlack, out int hiddenBlue)
