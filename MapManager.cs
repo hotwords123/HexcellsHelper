@@ -26,6 +26,8 @@ namespace HexcellsHelper
             EventManager.HighlightClicked += OnHexRevealed;
         }
 
+        public static bool IsCompleted => score != null && score.levelIsComplete;
+
         public static bool IsNonEmpty(Coordinate coord)
         {
             return GridAt(coord) != null;

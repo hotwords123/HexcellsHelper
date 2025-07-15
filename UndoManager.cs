@@ -10,7 +10,7 @@ namespace HexcellsHelper
 
         void Update()
         {
-            if (EventManager.IsLevelLoaded && Input.GetKeyDown(KeyCode.Z))
+            if (EventManager.IsLevelLoaded && !MapManager.IsCompleted && Input.GetKeyDown(KeyCode.Z))
             {
                 UndoLastAction();
             }

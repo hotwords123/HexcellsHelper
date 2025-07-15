@@ -8,7 +8,7 @@ namespace HexcellsHelper
     {
         void Update()
         {
-            if (EventManager.IsLevelLoaded && Input.GetKeyDown(KeyCode.Space))
+            if (EventManager.IsLevelLoaded && !MapManager.IsCompleted && Input.GetKeyDown(KeyCode.Space))
             {
                 if (!SolveTrivial())
                 {
