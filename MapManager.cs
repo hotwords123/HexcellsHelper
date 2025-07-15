@@ -96,9 +96,7 @@ namespace HexcellsHelper
                 remainingText.text = (score.numberOfBlueTiles - score.numberOfCorrectTilesFound).ToString();
 
                 // Update the hex number text
-                BepInEx.Bootstrap.Chainloader.ManagerObject
-                    .GetComponent<DisplayModeManager>()
-                    .UpdateHexNumbers();
+                DisplayModeManager.Instance.UpdateHexNumbers();
             }
 
             // Undo score.TileRemoved()

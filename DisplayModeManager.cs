@@ -6,7 +6,22 @@ namespace HexcellsHelper
 {
     public class DisplayModeManager : MonoBehaviour
     {
+        public static DisplayModeManager Instance { get; private set; }
+
         bool countRemainingOnly = false;
+
+        void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         void Update()
         {
