@@ -12,22 +12,16 @@ namespace HexcellsHelper
             EventManager.Init();
             MapManager.Init();
 
-            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<LevelDumper>();
-            Logger.LogInfo("LevelDumper component added to GameManager.");
-
-            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<UndoManager>();
-            Logger.LogInfo("UndoManager component added to GameManager.");
-
-            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<DisplayModeManager>();
-            Logger.LogInfo("DisplayModeManager component added to GameManager.");
-
-            BepInEx.Bootstrap.Chainloader.ManagerObject.AddComponent<TrivialSolver>();
-            Logger.LogInfo("TrivialSolver component added to GameManager.");
+            var managerObject = BepInEx.Bootstrap.Chainloader.ManagerObject;
+            managerObject.AddComponent<LevelDumper>();
+            managerObject.AddComponent<UndoManager>();
+            managerObject.AddComponent<DisplayModeManager>();
+            managerObject.AddComponent<TrivialSolver>();
 
             HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
 
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+            Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
     }
 }
