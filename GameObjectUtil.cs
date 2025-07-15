@@ -14,6 +14,11 @@ namespace HexcellsHelper
             return GameObject.Find("Game Manager(Clone)")?.GetComponent<GameManagerScript>();
         }
 
+        public static OptionsManager GetOptionsManager()
+        {
+            return GameObject.Find("Game Manager(Clone)").GetComponent<OptionsManager>();
+        }
+
         public static GameObject GetHexGrid()
         {
             return GameObject.Find("Hex Grid");

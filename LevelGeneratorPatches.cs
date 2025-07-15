@@ -7,7 +7,10 @@ namespace HexcellsHelper
     {
         static void Postfix(LevelGenerator __instance)
         {
-            EventManager.TriggerLevelLoaded();
+            if (GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
+            {
+                EventManager.TriggerLevelLoaded();
+            }
         }
     }
 
@@ -16,7 +19,10 @@ namespace HexcellsHelper
     {
         static void Postfix(OldLevelGenerator __instance)
         {
-            EventManager.TriggerLevelLoaded();
+            if (!GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
+            {
+                EventManager.TriggerLevelLoaded();
+            }
         }
     }
 }
