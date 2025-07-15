@@ -105,7 +105,7 @@ namespace HexcellsHelper
             else if (hiddenBlue == 0)
             {
                 // all hidden cells are black, we can solve it
-                foreach (var otherCoord in coords)
+                foreach (var otherCoord in hiddenCoords)
                 {
                     MapManager.SetBlack(otherCoord);
                 }
