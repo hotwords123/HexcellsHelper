@@ -10,9 +10,12 @@ namespace HexcellsHelper
         {
             if (EventManager.IsLevelLoaded && !MapManager.IsCompleted && Input.GetKeyDown(KeyCode.Space))
             {
-                if (!SolveTrivial())
+                using (UndoManager.Instance.CreateGroup())
                 {
-                    GameObjectUtil.GetMusicDirector().PlayWrongNote(0.0f);
+                    if (!SolveTrivial())
+                    {
+                        GameObjectUtil.GetMusicDirector().PlayWrongNote(0.0f);
+                    }
                 }
             }
         }
@@ -156,6 +159,7 @@ namespace HexcellsHelper
                 var flower = cell.GetComponent<BlueHexFlower>();
                 if (!flower.playerHasMarkedComplete)
                 {
+                    UndoManager.Instance.AddAction(new MarkFlowerAsCompleteUndoAction(flower));
                     flower.ToggleMarkComplete();
                 }
             }
@@ -178,6 +182,7 @@ namespace HexcellsHelper
                 var columnNumber = column.GetComponent<ColumnNumber>();
                 if (!columnNumber.playerHasMarkedComplete)
                 {
+                    UndoManager.Instance.AddAction(new MarkColumnAsCompleteUndoAction(columnNumber));
                     columnNumber.ToggleMarkComplete();
                 }
             }
