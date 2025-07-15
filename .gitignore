@@ -58,3 +58,6 @@ nunit-*.xml
 
 # Level files
 *.hexcells
+
+# Configuration files
+game-directory.txt

@@ -14,7 +14,10 @@
    - Additionally, ensure that the `doorstop_config.ini` and `winhttp.dll` files are also extracted into the root directory of your game. These files are required for BepInEx to function properly.
 
 3. **Configure the project**
-   - Edit the project file (`HexcellsHelper.csproj`) based on the actual game installation path to ensure the paths are configured correctly.
+   - Create `game-directory.txt` in the project root and input your game's installation path. For example:
+     ```
+     C:\Program Files (x86)\Steam\steamapps\common\Hexcells Infinite
+     ```
 
 4. **Build the plugin**
    - Run the following command in the root directory of the project:

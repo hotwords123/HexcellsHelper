@@ -7,7 +7,7 @@
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
-    <GameDirectory>C:\Program Files (x86)\Steam\steamapps\common\Hexcells Infinite</GameDirectory>
+    <GameDirectory>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\game-directory.txt').Trim())</GameDirectory>
   </PropertyGroup>
 
   <ItemGroup>
