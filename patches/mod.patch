@@ -1,0 +1,265 @@
+diff --git a/Assembly-CSharp.csproj b/Assembly-CSharp.csproj
+index 7aa9e25..3c48376 100644
+--- a/Assembly-CSharp.csproj
++++ b/Assembly-CSharp.csproj
+@@ -5,7 +5,7 @@
+     <TargetFramework>net35</TargetFramework>
+   </PropertyGroup>
+   <PropertyGroup>
+-    <LangVersion>12.0</LangVersion>
++    <LangVersion>latest</LangVersion>
+     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+   </PropertyGroup>
+   <PropertyGroup />
+diff --git a/GameManagerScript.cs b/GameManagerScript.cs
+index 29875a3..9a18957 100644
+--- a/GameManagerScript.cs
++++ b/GameManagerScript.cs
+@@ -96,6 +96,7 @@ public class GameManagerScript : MonoBehaviour
+ 		}
+ 		CheckInitialStartUp();
+ 		GameObject.Find("Fader").GetComponent<FaderScript>().FadeInAudio();
++		HexcellsHelper.Plugin.Init(gameObject);
+ 	}
+ 
+ 	private void CheckInitialStartUp()
+diff --git a/HexBehaviour.cs b/HexBehaviour.cs
+index 76bebbe..313a59f 100644
+--- a/HexBehaviour.cs
++++ b/HexBehaviour.cs
+@@ -107,6 +107,7 @@ public class HexBehaviour : MonoBehaviour
+ 			}
+ 			Object.Destroy(particleSystem.gameObject, 3f);
+ 			Object.Destroy(base.gameObject);
++			HexcellsHelper.EventManager.OnDestroyClick(this);
+ 		}
+ 		else
+ 		{
+@@ -131,6 +132,7 @@ public class HexBehaviour : MonoBehaviour
+ 				musicDirector.PlayNoteA(base.transform.position.x / 7.04f);
+ 			}
+ 			iTween.ScaleTo(base.gameObject, iTween.Hash("scale", Vector3.zero, "time", 0.3f, "oncomplete", "DestroyThis"));
++			HexcellsHelper.EventManager.OnHighlightClick(this);
+ 		}
+ 		else
+ 		{
+diff --git a/HexcellsHelper/HexBehaviourPatches.cs b/HexcellsHelper/HexBehaviourPatches.cs
+deleted file mode 100644
+index c40dc26..0000000
+--- a/HexcellsHelper/HexBehaviourPatches.cs
++++ /dev/null
+@@ -1,28 +0,0 @@
+-using HarmonyLib;
+-
+-namespace HexcellsHelper
+-{
+-    [HarmonyPatch(typeof(HexBehaviour), "DestroyClick")]
+-    public class Patch_HexBehaviour_DestroyClick
+-    {
+-        static void Postfix(HexBehaviour __instance)
+-        {
+-            if (!__instance.containsShapeBlock)
+-            {
+-                EventManager.OnDestroyClick(__instance);
+-            }
+-        }
+-    }
+-
+-    [HarmonyPatch(typeof(HexBehaviour), "HighlightClick")]
+-    public class Patch_HexBehaviour_HighlightClick
+-    {
+-        static void Postfix(HexBehaviour __instance)
+-        {
+-            if (__instance.containsShapeBlock)
+-            {
+-                EventManager.OnHighlightClick(__instance);
+-            }
+-        }
+-    }
+-}
+diff --git a/HexcellsHelper/LevelGeneratorPatches.cs b/HexcellsHelper/LevelGeneratorPatches.cs
+deleted file mode 100644
+index 5719b58..0000000
+--- a/HexcellsHelper/LevelGeneratorPatches.cs
++++ /dev/null
+@@ -1,28 +0,0 @@
+-using HarmonyLib;
+-
+-namespace HexcellsHelper
+-{
+-    [HarmonyPatch(typeof(LevelGenerator), "Start")]
+-    public class Patch_LevelGenerator_Start
+-    {
+-        static void Postfix(LevelGenerator __instance)
+-        {
+-            if (GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
+-            {
+-                EventManager.TriggerLevelLoaded();
+-            }
+-        }
+-    }
+-
+-    [HarmonyPatch(typeof(OldLevelGenerator), "Start")]
+-    public class Patch_OldLevelGenerator_Start
+-    {
+-        static void Postfix(OldLevelGenerator __instance)
+-        {
+-            if (!GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
+-            {
+-                EventManager.TriggerLevelLoaded();
+-            }
+-        }
+-    }
+-}
+diff --git a/HexcellsHelper/Plugin.cs b/HexcellsHelper/Plugin.cs
+index 37867dc..3a38f24 100644
+--- a/HexcellsHelper/Plugin.cs
++++ b/HexcellsHelper/Plugin.cs
+@@ -1,26 +1,20 @@
+-﻿using BepInEx;
+-using UnityEngine;
++﻿using UnityEngine;
+ 
+ namespace HexcellsHelper
+ {
+-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+-    public class Plugin : BaseUnityPlugin
++    public static class Plugin
+     {
+-        void Awake()
++        public static void Init(GameObject managerObject)
+         {
+             // Plugin startup logic
+             EventManager.Init();
+             MapManager.Init();
+ 
+-            var managerObject = BepInEx.Bootstrap.Chainloader.ManagerObject;
+             managerObject.AddComponent<LevelDumper>();
+             managerObject.AddComponent<UndoManager>();
+             managerObject.AddComponent<DisplayModeManager>();
+             managerObject.AddComponent<TrivialSolver>();
+ 
+-            HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
+-            harmony.PatchAll();
+-
+             Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+         }
+     }
+diff --git a/HexcellsHelper/UndoableActions.cs b/HexcellsHelper/UndoableActions.cs
+index 6ba86b0..60b56c5 100644
+--- a/HexcellsHelper/UndoableActions.cs
++++ b/HexcellsHelper/UndoableActions.cs
+@@ -1,6 +1,5 @@
+ using System.Collections.Generic;
+ using System.Reflection;
+-using HarmonyLib;
+ using UnityEngine;
+ 
+ namespace HexcellsHelper
+@@ -15,8 +14,10 @@ namespace HexcellsHelper
+ 
+     public class MarkFlowerAsCompleteUndoAction(BlueHexFlower flower) : IUndoableAction
+     {
+-        private static readonly FieldInfo guideIsOffField = AccessTools.Field(typeof(BlueHexFlower), "guideIsOff");
+-        private static readonly MethodInfo toggleHexGuideMethod = AccessTools.Method(typeof(BlueHexFlower), "ToggleHexGuide");
++        private static readonly FieldInfo guideIsOffField =
++            typeof(BlueHexFlower).GetField("guideIsOff", BindingFlags.NonPublic | BindingFlags.Instance);
++        private static readonly MethodInfo toggleHexGuideMethod =
++            typeof(BlueHexFlower).GetMethod("ToggleHexGuide", BindingFlags.NonPublic | BindingFlags.Instance);
+ 
+         private readonly BlueHexFlower flower = flower;
+         private readonly bool previousGuideState = (bool)guideIsOffField.GetValue(flower);
+@@ -36,7 +37,8 @@ namespace HexcellsHelper
+ 
+     public class MarkColumnAsCompleteUndoAction(ColumnNumber column) : IUndoableAction
+     {
+-        private static readonly FieldInfo thisRendererField = AccessTools.Field(typeof(ColumnNumber), "thisRenderer");
++        private static readonly FieldInfo thisRendererField =
++            typeof(ColumnNumber).GetField("thisRenderer", BindingFlags.NonPublic | BindingFlags.Instance);
+ 
+         private readonly ColumnNumber column = column;
+         private readonly bool previousGuideState = ((Renderer)thisRendererField.GetValue(column)).enabled;
+diff --git a/LevelGenerator.cs b/LevelGenerator.cs
+index 947f484..d18867a 100644
+--- a/LevelGenerator.cs
++++ b/LevelGenerator.cs
+@@ -125,6 +125,7 @@ public class LevelGenerator : MonoBehaviour
+ 			GenerateLevelShapeHourglass();
+ 		}
+ 		SetupLevel();
++		HexcellsHelper.EventManager.TriggerLevelLoaded();
+ 	}
+ 
+ 	private void GenerateRandomSeedNumber()
+diff --git a/OldLevelGenerator.cs b/OldLevelGenerator.cs
+index ed77ecc..0c9deaf 100644
+--- a/OldLevelGenerator.cs
++++ b/OldLevelGenerator.cs
+@@ -109,6 +109,7 @@ public class OldLevelGenerator : MonoBehaviour
+ 		}
+ 		SetupLevel();
+ 		SolvePuzzle();
++		HexcellsHelper.EventManager.TriggerLevelLoaded();
+ 	}
+ 
+ 	private void GenerateRandomSeedNumber()
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..ce1227d
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,54 @@
++## A streamlined .gitignore for modern .NET projects
++## including temporary files, build results, and
++## files generated by popular .NET tools. If you are
++## developing with Visual Studio, the VS .gitignore
++## https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
++## has more thorough IDE-specific entries.
++##
++## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
++
++# Build results
++[Dd]ebug/
++[Dd]ebugPublic/
++[Rr]elease/
++[Rr]eleases/
++x64/
++x86/
++[Ww][Ii][Nn]32/
++[Aa][Rr][Mm]/
++[Aa][Rr][Mm]64/
++bld/
++[Bb]in/
++[Oo]bj/
++[Ll]og/
++[Ll]ogs/
++
++# .NET Core
++project.lock.json
++project.fragment.lock.json
++artifacts/
++
++# ASP.NET Scaffolding
++ScaffoldingReadMe.txt
++
++# NuGet Packages
++*.nupkg
++# NuGet Symbol Packages
++*.snupkg
++
++# Others
++~$*
++*~
++CodeCoverage/
++
++# MSBuild Binary and Structured Log
++*.binlog
++
++# MSTest test Results
++[Tt]est[Rr]esult*/
++[Bb]uild[Ll]og.*
++
++# NUnit
++*.VisualState.xml
++TestResult.xml
++nunit-*.xml
