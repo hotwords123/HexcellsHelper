@@ -10,6 +10,11 @@ namespace HexcellsHelper
 
         void Update()
         {
+            if (!EventManager.IsLevelLoaded)
+            {
+                return;
+            }
+
             // Toggle display mode when T is pressed
             if (Input.GetKeyDown(KeyCode.T))
             {

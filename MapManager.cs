@@ -20,7 +20,8 @@ namespace HexcellsHelper
 
         public static void Init()
         {
-            EventManager.LevelLoaded += InitializeMap;
+            EventManager.LevelLoaded += OnLevelLoaded;
+            EventManager.LevelUnloaded += OnLevelUnloaded;
             EventManager.DestroyClicked += OnHexRevealed;
             EventManager.HighlightClicked += OnHexRevealed;
         }
@@ -100,7 +101,7 @@ namespace HexcellsHelper
             return true;
         }
 
-        static void InitializeMap()
+        static void OnLevelLoaded()
         {
             hexGrid = GameObjectUtil.GetHexGrid();
             hexGridOverlay = GameObjectUtil.GetHexGridOverlay();
@@ -135,6 +136,20 @@ namespace HexcellsHelper
                 .Cast<Transform>()
                 .Select(tr => tr.gameObject)
                 .ToArray();
+        }
+
+        static void OnLevelUnloaded()
+        {
+            // Clear GameObject references
+            grid = null;
+            gridOverlay = null;
+            columnNumbers = null;
+            hexGrid = null;
+            hexGridOverlay = null;
+            columnsParent = null;
+            editorFunctions = null;
+            score = null;
+            remainingText = null;
         }
 
         static void OnHexRevealed(HexBehaviour hexBehaviour)

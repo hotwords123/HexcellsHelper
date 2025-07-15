@@ -7,7 +7,7 @@ namespace HexcellsHelper
     {
         static void Postfix(LevelGenerator __instance)
         {
-            EventManager.OnLevelLoaded();
+            EventManager.TriggerLevelLoaded();
         }
     }
 
@@ -16,7 +16,7 @@ namespace HexcellsHelper
     {
         static void Postfix(OldLevelGenerator __instance)
         {
-            EventManager.OnLevelLoaded();
+            EventManager.TriggerLevelLoaded();
         }
     }
 }

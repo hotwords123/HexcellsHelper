@@ -10,7 +10,7 @@ namespace HexcellsHelper
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Z))
+            if (EventManager.IsLevelLoaded && Input.GetKeyDown(KeyCode.Z))
             {
                 UndoLastAction();
             }
@@ -18,16 +18,21 @@ namespace HexcellsHelper
 
         void OnEnable()
         {
-            EventManager.LevelLoaded += undoStack.Clear;
+            EventManager.LevelUnloaded += OnLevelUnloaded;
             EventManager.DestroyClicked += OnHexRevealed;
             EventManager.HighlightClicked += OnHexRevealed;
         }
 
         void OnDisable()
         {
-            EventManager.LevelLoaded -= undoStack.Clear;
+            EventManager.LevelUnloaded -= OnLevelUnloaded;
             EventManager.DestroyClicked -= OnHexRevealed;
             EventManager.HighlightClicked -= OnHexRevealed;
+        }
+
+        void OnLevelUnloaded()
+        {
+            undoStack.Clear();
         }
 
         void OnHexRevealed(HexBehaviour hexBehaviour)

@@ -10,7 +10,7 @@ namespace HexcellsHelper
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F2))
+            if (EventManager.IsLevelLoaded && Input.GetKeyDown(KeyCode.F2))
             {
                 string levelText = SerializeCurrentLevel();
                 if (string.IsNullOrEmpty(levelText))
