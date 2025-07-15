@@ -35,3 +35,4 @@ The HexcellsHelper plugin provides the following functionalities in game:
 - **Z**: Undoes the last action (left-click or right-click).
 - **T**: Toggles the display mode (whether the numbers on the cells represent the total number of blue cells or the remaining blue cells).
 - **Tab**: Temporarily switches the display mode while held down (reverts when released).
+- **Space**: Invokes the trivial solver to resolve simple cases automatically.
