@@ -79,6 +79,7 @@ namespace HexcellsHelper
                 return false;
             }
 
+            // Restore the foreground hex at the saved position
             overlayCell = Object.Instantiate(
                 editorFunctions.orangeHex,
                 cell.transform.position,
@@ -89,15 +90,21 @@ namespace HexcellsHelper
 
             if (cell.tag == "Blue")
             {
+                // Undo score.CorrectTileFound()
                 score.numberOfCorrectTilesFound--;
                 overlayCell.GetComponent<HexBehaviour>().containsShapeBlock = true;
                 remainingText.text = (score.numberOfBlueTiles - score.numberOfCorrectTilesFound).ToString();
+
+                // Update the hex number text
                 BepInEx.Bootstrap.Chainloader.ManagerObject
                     .GetComponent<DisplayModeManager>()
                     .UpdateHexNumbers();
             }
 
+            // Undo score.TileRemoved()
             score.tilesRemoved--;
+
+            // UX feedback
             GameObjectUtil.GetMusicDirector().PlayWrongNote(overlayCell.transform.position.x / 7.04f);
             iTween.ShakePosition(overlayCell, new Vector3(0.1f, 0.1f, 0f), 0.3f);
             return true;
