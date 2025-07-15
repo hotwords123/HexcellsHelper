@@ -8,7 +8,7 @@ namespace HexcellsHelper
     {
         static GameObject[,] grid;
         static GameObject[,] gridOverlay;
-        static GameObject[] columnNumbers;
+        static GameObject[] columns;
         static GameObject hexGrid;
         static GameObject hexGridOverlay;
         static GameObject columnsParent;
@@ -16,7 +16,7 @@ namespace HexcellsHelper
         static HexScoring score;
         static TextMesh remainingText;
 
-        public static GameObject[] Columns => columnNumbers;
+        public static GameObject[] Columns => columns;
 
         public static void Init()
         {
@@ -132,7 +132,7 @@ namespace HexcellsHelper
                 gridOverlay[coord.X, coord.Y] = tr.gameObject;
             }
 
-            columnNumbers = columnsParent.transform
+            columns = columnsParent.transform
                 .Cast<Transform>()
                 .Select(tr => tr.gameObject)
                 .ToArray();
@@ -143,7 +143,7 @@ namespace HexcellsHelper
             // Clear GameObject references
             grid = null;
             gridOverlay = null;
-            columnNumbers = null;
+            columns = null;
             hexGrid = null;
             hexGridOverlay = null;
             columnsParent = null;
