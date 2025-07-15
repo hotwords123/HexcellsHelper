@@ -1,34 +1,87 @@
 # HexcellsHelper
 
+A QoL helper for the puzzle game [Hexcells Infinite](https://store.steampowered.com/app/304410/Hexcells_Infinite/).
+
+## Prerequisites
+
+- Ensure that the [.NET SDK](https://dotnet.microsoft.com/download) is installed. You can verify the installation by running the following command:
+  ```bash
+  dotnet --version
+  ```
+- [BepInEx](https://github.com/BepInEx/BepInEx) for dynamic injection (if using Method 1).
+- [ILSpyCmd](https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.ILSpyCmd) for decompilation (if using Method 2).
+
 ## Installation
 
-1. **Set up the .NET development environment**
-   - Ensure that the [.NET SDK](https://dotnet.microsoft.com/download) is installed. You can verify the installation by running the following command:
-     ```bash
-     dotnet --version
-     ```
+### Configuration
 
-2. **Install BepInEx**
+- Create `game-directory.txt` in the project root and input your game's installation path. For example:
+  ```
+  C:\Program Files (x86)\Steam\steamapps\common\Hexcells Infinite
+  ```
+
+### Method 1: Dynamic Injection via BepInEx
+
+This method uses [BepInEx](https://github.com/BepInEx/BepInEx) for dynamic injection of the plugin into the game. It is the recommended way to install the HexcellsHelper plugin, as it allows for easier updates and management of the plugin, and does not require modifying the game's original files.
+
+1. **Install BepInEx**
    - Go to the [BepInEx Releases](https://github.com/BepInEx/BepInEx/releases) page and download the version suitable for your game. We use BepInEx 5 for this project.
    - Extract the downloaded files into the root directory of your game. This should create a `BepInEx` folder alongside the game executable.
    - Additionally, ensure that the `doorstop_config.ini` and `winhttp.dll` files are also extracted into the root directory of your game. These files are required for BepInEx to function properly.
 
-3. **Configure the project**
-   - Create `game-directory.txt` in the project root and input your game's installation path. For example:
-     ```
-     C:\Program Files (x86)\Steam\steamapps\common\Hexcells Infinite
-     ```
-
-4. **Build the plugin**
+2. **Build the plugin**
    - Run the following command in the root directory of the project:
-     ```bash
-     dotnet restore
-     dotnet build --no-restore -c Release
-     ```
+   ```bash
+   dotnet build -c Release -v d
+   ```
    - After building, the generated DLL file will be automatically copied to the `plugins` directory of BepInEx.
 
-5. **Launch the game**
+3. **Launch the game**
    - Start the game to load the plugin.
+
+### Method 2: Static Injection via Assembly-CSharp Patch
+
+Alternatively, you can apply the mod by patching the game's `Assembly-CSharp.dll` directly. This method uses decompilation, patch application, and recompilation to produce a modified `Assembly-CSharp.dll`.
+
+#### Workflow
+
+Use the provided script `scripts/build-patch.sh` to manage the workflow.
+
+```bash
+bash scripts/build-patch.sh <action> [work_dir]
+```
+
+Supported actions:
+
+* `decompile`
+  Decompile the original `Assembly-CSharp.dll` to a working directory and initialize a git repo. [ILSpyCmd](https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.ILSpyCmd) is used for decompilation. If it is not installed, the script will prompt you to install it.
+
+* `apply`
+  Copy mod source files and apply the existing patch on top of the decompiled files (if any).
+
+* `generate`
+  Generate an updated patch file based on differences from the original decompiled files.
+
+* `build`
+  Build the patched project into a new `Assembly-CSharp.dll`. Backs up the original DLL if not backed up yet and copies the new DLL to the game directory.
+
+* `restore`
+  Restore the original `Assembly-CSharp.dll` backup.
+
+To install the mod, run the following commands:
+
+```bash
+bash scripts/build-patch.sh decompile
+bash scripts/build-patch.sh apply
+bash scripts/build-patch.sh build
+```
+
+#### Notes
+
+* The working directory defaults to `../HexcellsHelper-AsmPatch` relative to the project root.
+* The generated patch file is stored as `patches/mod.patch`.
+* Backup of the original DLL is stored as `Assembly-CSharp.dll.original`.
+* To skip copying the rebuilt DLL to the game directory, create a `.no_copy` file in the working directory.
 
 ## Usage
 
