@@ -25,7 +25,7 @@ namespace HexcellsHelper
             }
             else
             {
-                Destroy(gameObject);
+                Destroy(this);
             }
         }
 
