@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -27,6 +28,19 @@ namespace HexcellsHelper
         public static GameObject GetHexGridOverlay()
         {
             return GameObject.Find("Hex Grid Overlay");
+        }
+
+        public static IEnumerable<GameObject> GetChildren(GameObject parent)
+        {
+            if (parent == null)
+            {
+                yield break;
+            }
+
+            foreach (Transform child in parent.transform)
+            {
+                yield return child.gameObject;
+            }
         }
     }
 }

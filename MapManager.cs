@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace HexcellsHelper
 {
@@ -8,7 +8,6 @@ namespace HexcellsHelper
     {
         static GameObject[,] grid;
         static GameObject[,] gridOverlay;
-        static GameObject[] columns;
         static GameObject hexGrid;
         static GameObject hexGridOverlay;
         static GameObject columnsParent;
@@ -16,7 +15,13 @@ namespace HexcellsHelper
         static HexScoring score;
         static TextMesh remainingText;
 
-        public static GameObject[] Columns => columns;
+        public static GameObject HexGrid => hexGrid;
+        public static GameObject HexGridOverlay => hexGridOverlay;
+        public static GameObject ColumnsParent => columnsParent;
+
+        public static IEnumerable<GameObject> Hexes => GameObjectUtil.GetChildren(hexGrid);
+        public static IEnumerable<GameObject> OverlayHexes => GameObjectUtil.GetChildren(hexGridOverlay);
+        public static IEnumerable<GameObject> Columns => GameObjectUtil.GetChildren(columnsParent);
 
         public static void Init()
         {
@@ -27,6 +32,7 @@ namespace HexcellsHelper
         }
 
         public static bool IsCompleted => score != null && score.levelIsComplete;
+        public static GameObject OrangeHex => editorFunctions?.orangeHex;
 
         public static bool IsNonEmpty(Coordinate coord)
         {
@@ -81,9 +87,9 @@ namespace HexcellsHelper
 
             // Restore the foreground hex at the saved position
             overlayCell = Object.Instantiate(
-                editorFunctions.orangeHex,
+                OrangeHex,
                 cell.transform.position,
-                editorFunctions.orangeHex.transform.rotation,
+                OrangeHex.transform.rotation,
                 hexGridOverlay.transform
             );
             gridOverlay[coord.X, coord.Y] = overlayCell;
@@ -118,31 +124,26 @@ namespace HexcellsHelper
             remainingText = score.GetComponent<TextMesh>();
 
             grid = new GameObject[CoordUtil.Width, CoordUtil.Height];
-            foreach (Transform tr in hexGrid.transform)
+            foreach (var hex in Hexes)
             {
-                var coord = CoordUtil.WorldToGrid(tr.position);
+                var coord = CoordUtil.WorldToGrid(hex.transform.position);
                 if (!CoordUtil.IsValidCoord(coord))
                 {
                     continue;
                 }
-                grid[coord.X, coord.Y] = tr.gameObject;
+                grid[coord.X, coord.Y] = hex;
             }
 
             gridOverlay = new GameObject[CoordUtil.Width, CoordUtil.Height];
-            foreach (Transform tr in hexGridOverlay.transform)
+            foreach (var hex in OverlayHexes)
             {
-                var coord = CoordUtil.WorldToGrid(tr.position);
+                var coord = CoordUtil.WorldToGrid(hex.transform.position);
                 if (!CoordUtil.IsValidCoord(coord))
                 {
                     continue;
                 }
-                gridOverlay[coord.X, coord.Y] = tr.gameObject;
+                gridOverlay[coord.X, coord.Y] = hex;
             }
-
-            columns = columnsParent.transform
-                .Cast<Transform>()
-                .Select(tr => tr.gameObject)
-                .ToArray();
         }
 
         static void OnLevelUnloaded()
@@ -150,7 +151,6 @@ namespace HexcellsHelper
             // Clear GameObject references
             grid = null;
             gridOverlay = null;
-            columns = null;
             hexGrid = null;
             hexGridOverlay = null;
             columnsParent = null;
