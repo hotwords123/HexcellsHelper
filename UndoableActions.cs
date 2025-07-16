@@ -74,4 +74,23 @@ namespace HexcellsHelper
             actions.Add(action);
         }
     }
+
+    public class HexHypothesisUndoAction(HexHypothesis hexHypothesis, HypothesisState previousState) : IUndoableAction
+    {
+        private readonly HexHypothesis hexHypothesis = hexHypothesis;
+        private readonly HypothesisState previousState = previousState;
+
+        public void Undo()
+        {
+            if (!HypothesisManager.Instance.IsHypothesisModeActive)
+            {
+                HypothesisManager.Instance.ToggleHypothesisMode();
+            }
+
+            hexHypothesis.State = previousState;
+
+            GameObjectUtil.GetMusicDirector().PlayMouseOverSound();
+            iTween.ShakePosition(hexHypothesis.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+        }
+    }
 }

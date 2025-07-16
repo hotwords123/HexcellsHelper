@@ -69,6 +69,8 @@ namespace HexcellsHelper
                 return;
             }
 
+            var previousState = State;
+
             if (Input.GetMouseButtonDown(0))
             {
                 if (State == HypothesisState.None)
@@ -90,6 +92,12 @@ namespace HexcellsHelper
                 {
                     State = HypothesisState.None;
                 }
+            }
+
+            if (previousState != State)
+            {
+                UndoManager.Instance.AddAction(new HexHypothesisUndoAction(this, previousState));
+                GameObjectUtil.GetMusicDirector().PlayMouseOverSound();
             }
         }
 

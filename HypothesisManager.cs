@@ -141,11 +141,23 @@ namespace HexcellsHelper
                 return;
             }
 
-            var hexHypotheses = hexGridOverlay.GetComponentsInChildren<HexHypothesis>();
-            foreach (var hexHypothesis in hexHypotheses)
+            using (UndoManager.Instance.CreateGroup())
             {
-                hexHypothesis.State = HypothesisState.None;
+                var hexHypotheses = hexGridOverlay.GetComponentsInChildren<HexHypothesis>();
+                foreach (var hexHypothesis in hexHypotheses)
+                {
+                    var previousState = hexHypothesis.State;
+                    if (previousState != HypothesisState.None)
+                    {
+                        hexHypothesis.State = HypothesisState.None;
+                        UndoManager.Instance.AddAction(new HexHypothesisUndoAction(hexHypothesis, previousState));
+
+                        iTween.ShakePosition(hexHypothesis.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+                    }
+                }
             }
+
+            GameObjectUtil.GetMusicDirector().PlayWrongNote(0.0f);
         }
     }
 }
