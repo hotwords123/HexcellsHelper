@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿using System.IO;
+using System.Reflection;
+using BepInEx;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -19,6 +21,7 @@ namespace HexcellsHelper
             managerObject.AddComponent<UndoManager>();
             managerObject.AddComponent<DisplayModeManager>();
             managerObject.AddComponent<TrivialSolver>();
+            managerObject.AddComponent<HypothesisManager>();
 
             HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();

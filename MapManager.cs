@@ -94,6 +94,8 @@ namespace HexcellsHelper
             );
             gridOverlay[coord.X, coord.Y] = overlayCell;
 
+            HypothesisManager.Instance?.SetupHexHypothesis(overlayCell);
+
             if (cell.tag == "Blue")
             {
                 // Undo score.CorrectTileFound()
