@@ -6,6 +6,8 @@ namespace HexcellsHelper
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        public static readonly string BaseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
         void Awake()
         {
             // Plugin startup logic

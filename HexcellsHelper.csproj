@@ -27,10 +27,21 @@
 
   <Target Name="CopyPlugin" AfterTargets="Build">
     <PropertyGroup>
-      <PluginOutputDir>$(GameDirectory)\BepInEx\plugins</PluginOutputDir>
+      <PluginOutputDir>$(GameDirectory)\BepInEx\plugins\HexcellsHelper</PluginOutputDir>
     </PropertyGroup>
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginOutputDir)" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(PluginOutputDir)" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+
+    <Copy SourceFiles="$(TargetPath)"
+      DestinationFolder="$(PluginOutputDir)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
+      DestinationFolder="$(PluginOutputDir)"
+      Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+
+    <ItemGroup>
+      <AssetFiles Include="Assets\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AssetFiles)"
+      DestinationFiles="@(AssetFiles->'$(PluginOutputDir)\Assets\%(RecursiveDir)%(Filename)%(Extension)')" />
+
     <Message Importance="high" Text="Plugin copied to $(PluginOutputDir)" />
   </Target>
 </Project>
