@@ -24,10 +24,21 @@ index 29875a3..9a18957 100644
  
  	private void CheckInitialStartUp()
 diff --git a/HexBehaviour.cs b/HexBehaviour.cs
-index 76bebbe..313a59f 100644
+index 76bebbe..d908836 100644
 --- a/HexBehaviour.cs
 +++ b/HexBehaviour.cs
-@@ -107,6 +107,7 @@ public class HexBehaviour : MonoBehaviour
+@@ -63,6 +63,10 @@ public class HexBehaviour : MonoBehaviour
+ 
+ 	private void OnMouseOver()
+ 	{
++		if (!enabled)
++		{
++			return;
++		}
+ 		if (Input.GetMouseButtonDown(0))
+ 		{
+ 			if (!mouseButtonsInverted)
+@@ -107,6 +111,7 @@ public class HexBehaviour : MonoBehaviour
  			}
  			Object.Destroy(particleSystem.gameObject, 3f);
  			Object.Destroy(base.gameObject);
@@ -35,7 +46,7 @@ index 76bebbe..313a59f 100644
  		}
  		else
  		{
-@@ -131,6 +132,7 @@ public class HexBehaviour : MonoBehaviour
+@@ -131,6 +136,7 @@ public class HexBehaviour : MonoBehaviour
  				musicDirector.PlayNoteA(base.transform.position.x / 7.04f);
  			}
  			iTween.ScaleTo(base.gameObject, iTween.Hash("scale", Vector3.zero, "time", 0.3f, "oncomplete", "DestroyThis"));
@@ -45,14 +56,28 @@ index 76bebbe..313a59f 100644
  		{
 diff --git a/HexcellsHelper/HexBehaviourPatches.cs b/HexcellsHelper/HexBehaviourPatches.cs
 deleted file mode 100644
-index c40dc26..0000000
+index d823e68..0000000
 --- a/HexcellsHelper/HexBehaviourPatches.cs
 +++ /dev/null
-@@ -1,28 +0,0 @@
+@@ -1,42 +0,0 @@
 -using HarmonyLib;
 -
 -namespace HexcellsHelper
 -{
+-    [HarmonyPatch(typeof(HexBehaviour), "OnMouseOver")]
+-    public class Patch_HexBehaviour_OnMouseOver
+-    {
+-        static bool Prefix(HexBehaviour __instance)
+-        {
+-            if (!__instance.enabled)
+-            {
+-                // Disable mouse interaction if the HexBehaviour is not enabled
+-                return false;
+-            }
+-            return true;
+-        }
+-    }
+-
 -    [HarmonyPatch(typeof(HexBehaviour), "DestroyClick")]
 -    public class Patch_HexBehaviour_DestroyClick
 -    {
@@ -112,13 +137,15 @@ index 5719b58..0000000
 -    }
 -}
 diff --git a/HexcellsHelper/Plugin.cs b/HexcellsHelper/Plugin.cs
-index 37867dc..3a38f24 100644
+index 98289f5..bdde60f 100644
 --- a/HexcellsHelper/Plugin.cs
 +++ b/HexcellsHelper/Plugin.cs
-@@ -1,26 +1,20 @@
--﻿using BepInEx;
--using UnityEngine;
-+﻿using UnityEngine;
+@@ -1,31 +1,24 @@
+-﻿using System.IO;
+-using System.Reflection;
+-using BepInEx;
++using System.IO;
+ using UnityEngine;
  
  namespace HexcellsHelper
  {
@@ -126,6 +153,9 @@ index 37867dc..3a38f24 100644
 -    public class Plugin : BaseUnityPlugin
 +    public static class Plugin
      {
+-        public static readonly string BaseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
++        public static readonly string BaseDir = Path.Combine(Application.dataPath, "HexcellsHelper");
+ 
 -        void Awake()
 +        public static void Init(GameObject managerObject)
          {
@@ -138,6 +168,7 @@ index 37867dc..3a38f24 100644
              managerObject.AddComponent<UndoManager>();
              managerObject.AddComponent<DisplayModeManager>();
              managerObject.AddComponent<TrivialSolver>();
+             managerObject.AddComponent<HypothesisManager>();
  
 -            HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
 -            harmony.PatchAll();
@@ -146,7 +177,7 @@ index 37867dc..3a38f24 100644
          }
      }
 diff --git a/HexcellsHelper/UndoableActions.cs b/HexcellsHelper/UndoableActions.cs
-index 6ba86b0..60b56c5 100644
+index dc9b3db..e80c714 100644
 --- a/HexcellsHelper/UndoableActions.cs
 +++ b/HexcellsHelper/UndoableActions.cs
 @@ -1,6 +1,5 @@

@@ -4,6 +4,7 @@ set -e
 src_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 game_dir=$(cat "$src_dir"/game-directory.txt)
 dll_path="$game_dir/Hexcells Infinite_Data/Managed/Assembly-CSharp.dll"
+plugin_dir="$game_dir/Hexcells Infinite_Data/HexcellsHelper"
 patch_file="$src_dir/patches/mod.patch"
 
 function decompile() {
@@ -100,6 +101,10 @@ function build() {
         echo "[!] Built DLL not found at $new_dll_path"
         exit 1
     fi
+
+    mkdir -p "$plugin_dir"
+    cp -r "$src_dir/Assets" "$plugin_dir/"
+    echo "[+] Assets copied to $plugin_dir"
 }
 
 function restore() {
@@ -112,6 +117,9 @@ function restore() {
         echo "[!] No backup found at $backup_path"
         exit 1
     fi
+
+    rm -rf "$plugin_dir"
+    echo "[+] Plugin directory removed: $plugin_dir"
 }
 
 function main() {
