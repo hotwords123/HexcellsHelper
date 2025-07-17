@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -15,20 +13,17 @@ namespace HexcellsHelper
 
     public class MarkFlowerAsCompleteUndoAction(BlueHexFlower flower) : IUndoableAction
     {
-        private static readonly FieldInfo guideIsOffField = AccessTools.Field(typeof(BlueHexFlower), "guideIsOff");
-        private static readonly MethodInfo toggleHexGuideMethod = AccessTools.Method(typeof(BlueHexFlower), "ToggleHexGuide");
-
         private readonly BlueHexFlower flower = flower;
-        private readonly bool previousGuideState = (bool)guideIsOffField.GetValue(flower);
+        private readonly bool previousGuideState = FlowerGuideUtil.GetGuideIsOff(flower);
 
         public void Undo()
         {
             if (flower.playerHasMarkedComplete)
             {
                 flower.ToggleMarkComplete();
-                if (previousGuideState && !(bool)guideIsOffField.GetValue(flower))
+                if (previousGuideState && !FlowerGuideUtil.GetGuideIsOff(flower))
                 {
-                    toggleHexGuideMethod.Invoke(flower, null);
+                    FlowerGuideUtil.ToggleHexGuide(flower);
                 }
             }
         }
@@ -36,17 +31,15 @@ namespace HexcellsHelper
 
     public class MarkColumnAsCompleteUndoAction(ColumnNumber column) : IUndoableAction
     {
-        private static readonly FieldInfo thisRendererField = AccessTools.Field(typeof(ColumnNumber), "thisRenderer");
-
         private readonly ColumnNumber column = column;
-        private readonly bool previousGuideState = ((Renderer)thisRendererField.GetValue(column)).enabled;
+        private readonly bool previousGuideState = ColumnGuideUtil.GetRenderer(column).enabled;
 
         public void Undo()
         {
             if (column.playerHasMarkedComplete)
             {
                 column.ToggleMarkComplete();
-                var renderer = (Renderer)thisRendererField.GetValue(column);
+                var renderer = ColumnGuideUtil.GetRenderer(column);
                 if (previousGuideState && !renderer.enabled)
                 {
                     renderer.enabled = true;
