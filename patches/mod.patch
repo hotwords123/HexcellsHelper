@@ -1,16 +1,18 @@
 diff --git a/Assembly-CSharp.csproj b/Assembly-CSharp.csproj
-index 7aa9e25..3c48376 100644
+index 7aa9e25..8466fd6 100644
 --- a/Assembly-CSharp.csproj
 +++ b/Assembly-CSharp.csproj
-@@ -5,7 +5,7 @@
+@@ -5,8 +5,9 @@
      <TargetFramework>net35</TargetFramework>
    </PropertyGroup>
    <PropertyGroup>
 -    <LangVersion>12.0</LangVersion>
 +    <LangVersion>latest</LangVersion>
      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
++    <DefineConstants>ASM_PATCH</DefineConstants>
    </PropertyGroup>
    <PropertyGroup />
+   <ItemGroup />
 diff --git a/GameManagerScript.cs b/GameManagerScript.cs
 index 29875a3..9a18957 100644
 --- a/GameManagerScript.cs
@@ -54,162 +56,6 @@ index 76bebbe..d908836 100644
  		}
  		else
  		{
-diff --git a/HexcellsHelper/HexBehaviourPatches.cs b/HexcellsHelper/HexBehaviourPatches.cs
-deleted file mode 100644
-index d823e68..0000000
---- a/HexcellsHelper/HexBehaviourPatches.cs
-+++ /dev/null
-@@ -1,42 +0,0 @@
--using HarmonyLib;
--
--namespace HexcellsHelper
--{
--    [HarmonyPatch(typeof(HexBehaviour), "OnMouseOver")]
--    public class Patch_HexBehaviour_OnMouseOver
--    {
--        static bool Prefix(HexBehaviour __instance)
--        {
--            if (!__instance.enabled)
--            {
--                // Disable mouse interaction if the HexBehaviour is not enabled
--                return false;
--            }
--            return true;
--        }
--    }
--
--    [HarmonyPatch(typeof(HexBehaviour), "DestroyClick")]
--    public class Patch_HexBehaviour_DestroyClick
--    {
--        static void Postfix(HexBehaviour __instance)
--        {
--            if (!__instance.containsShapeBlock)
--            {
--                EventManager.OnDestroyClick(__instance);
--            }
--        }
--    }
--
--    [HarmonyPatch(typeof(HexBehaviour), "HighlightClick")]
--    public class Patch_HexBehaviour_HighlightClick
--    {
--        static void Postfix(HexBehaviour __instance)
--        {
--            if (__instance.containsShapeBlock)
--            {
--                EventManager.OnHighlightClick(__instance);
--            }
--        }
--    }
--}
-diff --git a/HexcellsHelper/LevelGeneratorPatches.cs b/HexcellsHelper/LevelGeneratorPatches.cs
-deleted file mode 100644
-index 5719b58..0000000
---- a/HexcellsHelper/LevelGeneratorPatches.cs
-+++ /dev/null
-@@ -1,28 +0,0 @@
--using HarmonyLib;
--
--namespace HexcellsHelper
--{
--    [HarmonyPatch(typeof(LevelGenerator), "Start")]
--    public class Patch_LevelGenerator_Start
--    {
--        static void Postfix(LevelGenerator __instance)
--        {
--            if (GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
--            {
--                EventManager.TriggerLevelLoaded();
--            }
--        }
--    }
--
--    [HarmonyPatch(typeof(OldLevelGenerator), "Start")]
--    public class Patch_OldLevelGenerator_Start
--    {
--        static void Postfix(OldLevelGenerator __instance)
--        {
--            if (!GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive)
--            {
--                EventManager.TriggerLevelLoaded();
--            }
--        }
--    }
--}
-diff --git a/HexcellsHelper/Plugin.cs b/HexcellsHelper/Plugin.cs
-index 98289f5..bdde60f 100644
---- a/HexcellsHelper/Plugin.cs
-+++ b/HexcellsHelper/Plugin.cs
-@@ -1,31 +1,24 @@
--﻿using System.IO;
--using System.Reflection;
--using BepInEx;
-+using System.IO;
- using UnityEngine;
- 
- namespace HexcellsHelper
- {
--    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
--    public class Plugin : BaseUnityPlugin
-+    public static class Plugin
-     {
--        public static readonly string BaseDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-+        public static readonly string BaseDir = Path.Combine(Application.dataPath, "HexcellsHelper");
- 
--        void Awake()
-+        public static void Init(GameObject managerObject)
-         {
-             // Plugin startup logic
-             EventManager.Init();
-             MapManager.Init();
- 
--            var managerObject = BepInEx.Bootstrap.Chainloader.ManagerObject;
-             managerObject.AddComponent<LevelDumper>();
-             managerObject.AddComponent<UndoManager>();
-             managerObject.AddComponent<DisplayModeManager>();
-             managerObject.AddComponent<TrivialSolver>();
-             managerObject.AddComponent<HypothesisManager>();
- 
--            HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
--            harmony.PatchAll();
--
-             Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
-         }
-     }
-diff --git a/HexcellsHelper/UndoableActions.cs b/HexcellsHelper/UndoableActions.cs
-index dc9b3db..e80c714 100644
---- a/HexcellsHelper/UndoableActions.cs
-+++ b/HexcellsHelper/UndoableActions.cs
-@@ -1,6 +1,5 @@
- using System.Collections.Generic;
- using System.Reflection;
--using HarmonyLib;
- using UnityEngine;
- 
- namespace HexcellsHelper
-@@ -15,8 +14,10 @@ namespace HexcellsHelper
- 
-     public class MarkFlowerAsCompleteUndoAction(BlueHexFlower flower) : IUndoableAction
-     {
--        private static readonly FieldInfo guideIsOffField = AccessTools.Field(typeof(BlueHexFlower), "guideIsOff");
--        private static readonly MethodInfo toggleHexGuideMethod = AccessTools.Method(typeof(BlueHexFlower), "ToggleHexGuide");
-+        private static readonly FieldInfo guideIsOffField =
-+            typeof(BlueHexFlower).GetField("guideIsOff", BindingFlags.NonPublic | BindingFlags.Instance);
-+        private static readonly MethodInfo toggleHexGuideMethod =
-+            typeof(BlueHexFlower).GetMethod("ToggleHexGuide", BindingFlags.NonPublic | BindingFlags.Instance);
- 
-         private readonly BlueHexFlower flower = flower;
-         private readonly bool previousGuideState = (bool)guideIsOffField.GetValue(flower);
-@@ -36,7 +37,8 @@ namespace HexcellsHelper
- 
-     public class MarkColumnAsCompleteUndoAction(ColumnNumber column) : IUndoableAction
-     {
--        private static readonly FieldInfo thisRendererField = AccessTools.Field(typeof(ColumnNumber), "thisRenderer");
-+        private static readonly FieldInfo thisRendererField =
-+            typeof(ColumnNumber).GetField("thisRenderer", BindingFlags.NonPublic | BindingFlags.Instance);
- 
-         private readonly ColumnNumber column = column;
-         private readonly bool previousGuideState = ((Renderer)thisRendererField.GetValue(column)).enabled;
 diff --git a/LevelGenerator.cs b/LevelGenerator.cs
 index 947f484..d18867a 100644
 --- a/LevelGenerator.cs

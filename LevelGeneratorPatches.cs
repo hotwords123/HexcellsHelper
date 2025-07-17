@@ -1,3 +1,5 @@
+#if !ASM_PATCH
+
 using HarmonyLib;
 
 namespace HexcellsHelper
@@ -26,3 +28,5 @@ namespace HexcellsHelper
         }
     }
 }
+
+#endif
