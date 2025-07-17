@@ -94,3 +94,5 @@ The HexcellsHelper plugin provides the following functionalities in game:
 - **Space**: Invokes the trivial solver to resolve simple cases automatically.
 - **H**: Toggles hypothesis mode on and off. In hypothesis mode, you can mark cells as hypothetical blue or black by left-clicking or right-clicking them (depending on the *"Swap Mouse Buttons"* setting). To remove a hypothesis mark, right-click the cell again.
 - **C**: Clears all hypothesis marks from the current level.
+- **G**: Toggles column guides for all column numbers that are not marked as complete.
+- **Shift + G**: Toggles flower guides for all blue hex flowers that are not marked as complete.

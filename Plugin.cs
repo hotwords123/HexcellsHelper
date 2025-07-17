@@ -22,6 +22,7 @@ namespace HexcellsHelper
             managerObject.AddComponent<DisplayModeManager>();
             managerObject.AddComponent<TrivialSolver>();
             managerObject.AddComponent<HypothesisManager>();
+            managerObject.AddComponent<GuideHelper>();
 
             HarmonyLib.Harmony harmony = new(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
