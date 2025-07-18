@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace HexcellsHelper
 {
@@ -18,6 +19,8 @@ namespace HexcellsHelper
         public static GameObject HexGrid => hexGrid;
         public static GameObject HexGridOverlay => hexGridOverlay;
         public static GameObject ColumnsParent => columnsParent;
+
+        public static List<Clue> Clues { get; private set; }
 
         public static IEnumerable<GameObject> Hexes => GameObjectUtil.GetChildren(hexGrid);
         public static IEnumerable<GameObject> OverlayHexes => GameObjectUtil.GetChildren(hexGridOverlay);
@@ -46,7 +49,7 @@ namespace HexcellsHelper
 
         public static GameObject GridAt(Coordinate coord)
         {
-            if (!CoordUtil.IsValidCoord(coord))
+            if (!coord.IsValid())
             {
                 return null;
             }
@@ -55,11 +58,16 @@ namespace HexcellsHelper
 
         public static GameObject GridOverlayAt(Coordinate coord)
         {
-            if (!CoordUtil.IsValidCoord(coord))
+            if (!coord.IsValid())
             {
                 return null;
             }
             return gridOverlay[coord.X, coord.Y];
+        }
+
+        public static CellType CellTypeAt(Coordinate coord)
+        {
+            return MapUtil.GetCellType(GridAt(coord));
         }
 
         public static void SetBlack(Coordinate coord)
@@ -96,7 +104,7 @@ namespace HexcellsHelper
 
             HypothesisManager.Instance?.SetupHexHypothesis(overlayCell);
 
-            if (cell.tag == "Blue")
+            if (MapUtil.GetCellType(cell) == CellType.Blue)
             {
                 // Undo score.CorrectTileFound()
                 score.numberOfCorrectTilesFound--;
@@ -125,27 +133,32 @@ namespace HexcellsHelper
             score = GameObject.Find("Score Text").GetComponent<HexScoring>();
             remainingText = score.GetComponent<TextMesh>();
 
-            grid = new GameObject[CoordUtil.Width, CoordUtil.Height];
+            grid = new GameObject[Coordinate.Width, Coordinate.Height];
             foreach (var hex in Hexes)
             {
-                var coord = CoordUtil.WorldToGrid(hex.transform.position);
-                if (!CoordUtil.IsValidCoord(coord))
+                var coord = Coordinate.FromGameObject(hex);
+                if (!coord.IsValid())
                 {
                     continue;
                 }
                 grid[coord.X, coord.Y] = hex;
             }
 
-            gridOverlay = new GameObject[CoordUtil.Width, CoordUtil.Height];
+            gridOverlay = new GameObject[Coordinate.Width, Coordinate.Height];
             foreach (var hex in OverlayHexes)
             {
-                var coord = CoordUtil.WorldToGrid(hex.transform.position);
-                if (!CoordUtil.IsValidCoord(coord))
+                var coord = Coordinate.FromGameObject(hex);
+                if (!coord.IsValid())
                 {
                     continue;
                 }
                 gridOverlay[coord.X, coord.Y] = hex;
             }
+
+            Clues = [];
+            Clues.AddRange(Hexes.Select(Clue.FromHex).Where(clue => clue != null));
+            Clues.AddRange(Columns.Select(Clue.FromColumn).Where(clue => clue != null));
+            Clues.Add(Clue.FromWholeLevel());
         }
 
         static void OnLevelUnloaded()
@@ -159,6 +172,7 @@ namespace HexcellsHelper
             editorFunctions = null;
             score = null;
             remainingText = null;
+            Clues = null;
         }
 
         static void OnHexRevealed(HexBehaviour hexBehaviour)
@@ -167,8 +181,7 @@ namespace HexcellsHelper
             {
                 return;
             }
-            var position = hexBehaviour.transform.position;
-            var coord = CoordUtil.WorldToGrid(position);
+            var coord = Coordinate.FromGameObject(hexBehaviour.gameObject);
             gridOverlay[coord.X, coord.Y] = null;
         }
     }

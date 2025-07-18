@@ -30,43 +30,31 @@ namespace HexcellsHelper
 
         string SerializeCurrentLevel()
         {
-            char[,] grid = new char[CoordUtil.Width * 2, CoordUtil.Height];
-            for (int x = 0; x < CoordUtil.Width * 2; x++)
-            {
-                for (int y = 0; y < CoordUtil.Height; y++)
-                {
-                    grid[x, y] = '.';
-                }
-            }
+            char[,] grid = new char[Coordinate.Height, Coordinate.Width * 2];
 
-            foreach (var coord in CoordUtil.AllCoords())
+            foreach (var coord in Coordinate.AllCoords())
             {
                 var cell = MapManager.GridAt(coord);
-                if (cell == null)
-                {
-                    continue;
-                }
+                var cellType = MapUtil.GetCellType(cell);
+                char kind = '.', info = '.';
 
-                char kind, info;
-                if (cell.tag == "Blue")
-                {
-                    kind = 'x';
-                    info = cell.name switch
-                    {
-                        "Blue Hex (Flower)" => '+',
-                        _ => '.'
-                    };
-                }
-                else
+                if (cellType == CellType.Black)
                 {
                     kind = 'o';
-                    info = cell.tag switch
+                    if (!MapUtil.IsBlackHexBlank(cell))
                     {
-                        "Clue Hex Blank" => '.',
-                        "Clue Hex (Sequential)" => 'c',
-                        "Clue Hex (NOT Sequential)" => 'n',
-                        _ => '+',
-                    };
+                        info = MapUtil.GetBlackHexModifier(cell) switch
+                        {
+                            Clue.Modifier.Consecutive => 'c',
+                            Clue.Modifier.NonConsecutive => 'n',
+                            _ => '+',
+                        };
+                    }
+                }
+                else if (cellType == CellType.Blue)
+                {
+                    kind = 'x';
+                    info = MapUtil.IsBlueHexFlower(cell) ? '+' : '.';
                 }
 
                 if (!MapManager.IsHidden(coord))
@@ -74,30 +62,29 @@ namespace HexcellsHelper
                     kind = char.ToUpper(kind);
                 }
 
-                grid[coord.X * 2, coord.Y] = kind;
-                grid[coord.X * 2 + 1, coord.Y] = info;
+                grid[coord.Y, coord.X * 2] = kind;
+                grid[coord.Y, coord.X * 2 + 1] = info;
             }
 
             foreach (var column in MapManager.Columns)
             {
-                var coord = CoordUtil.WorldToGrid(column.transform.position);
+                var coord = Coordinate.FromGameObject(column);
 
-                char kind = column.name switch
+                char kind = MapUtil.GetColumnType(column) switch
                 {
-                    "Column Number Diagonal Right" => '\\',
-                    "Column Number Diagonal Left" => '/',
+                    ColumnType.DiagonalLeft => '/',
+                    ColumnType.DiagonalRight => '\\',
                     _ => '|',
                 };
-                char info = column.tag switch
+                char info = MapUtil.GetColumnModifier(column) switch
                 {
-                    "Column Sequential" => 'c',
-                    "Column NOT Sequential" => 'n',
-                    _ => '+'
+                    Clue.Modifier.Consecutive => 'c',
+                    Clue.Modifier.NonConsecutive => 'n',
+                    _ => '+',
                 };
-                var x = coord.X;
-                var y = coord.Y;
-                grid[x * 2, y] = kind;
-                grid[x * 2 + 1, y] = info;
+
+                grid[coord.Y, coord.X * 2] = kind;
+                grid[coord.Y, coord.X * 2 + 1] = info;
             }
 
             var sb = new StringBuilder();
@@ -109,11 +96,11 @@ namespace HexcellsHelper
             sb.AppendLine("");
             sb.AppendLine("");
 
-            for (int y = CoordUtil.Height - 1; y >= 0; y--)
+            for (int y = Coordinate.Height - 1; y >= 0; y--)
             {
-                for (int x = 0; x < CoordUtil.Width * 2; x++)
+                for (int x = 0; x < Coordinate.Width * 2; x++)
                 {
-                    sb.Append(grid[x, y]);
+                    sb.Append(grid[y, x]);
                 }
                 sb.AppendLine();
             }

@@ -84,76 +84,36 @@ namespace HexcellsHelper
         int CalculateNumberForCoords(IEnumerable<Coordinate> coords)
         {
             return coords.Count(coord =>
-                MapManager.GridAt(coord)?.tag == "Blue" &&
+                MapManager.CellTypeAt(coord) == CellType.Blue &&
                 (!countRemainingOnly || MapManager.IsHidden(coord))
             );
         }
 
         public void UpdateHexNumbers()
         {
-            foreach (var coord in CoordUtil.AllCoords())
+            foreach (var clue in MapManager.Clues)
             {
-                var cell = MapManager.GridAt(coord);
-                if (cell == null)
+                if (clue.sourceGO == null)
                 {
                     continue;
                 }
 
-                IEnumerable<Coordinate> otherCoords;
-                if (cell.tag == "Blue")
+                var number = CalculateNumberForCoords(clue.coords);
+                var text = clue.modifier switch
                 {
-                    // Skip non-flower blue hexes
-                    if (cell.name != "Blue Hex (Flower)") continue;
-                    // Use flower coordinates for blue hexes
-                    otherCoords = CoordUtil.FlowerCoords(coord);
-                }
-                else
-                {
-                    // Skip blank black hexes
-                    if (cell.tag.StartsWith("Clue Hex Blank")) continue;
-                    // Use surrounding coordinates for clue hexes
-                    otherCoords = CoordUtil.SurroundCoords(coord);
-                }
-
-                // Count the number of blue hexes in the surrounding coordinates
-                int blueCount = CalculateNumberForCoords(otherCoords);
-
-                // Update the hex number text
-                string text = blueCount.ToString();
-                if (cell.tag.StartsWith("Clue Hex (Sequential)"))
-                {
-                    text = "{" + text + "}";
-                }
-                else if (cell.tag.StartsWith("Clue Hex (NOT Sequential)"))
-                {
-                    text = "-" + text + "-";
-                }
-                cell.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
-            }
-
-            foreach (var column in MapManager.Columns)
-            {
-                var coord = CoordUtil.WorldToGrid(column.transform.position);
-
-                IEnumerable<Coordinate> otherCoords = column.name switch
-                {
-                    "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
-                    "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
-                    _ => CoordUtil.VerticalCoords(coord),
+                    Clue.Modifier.Consecutive => "{" + number + "}",
+                    Clue.Modifier.NonConsecutive => "-" + number + "-",
+                    _ => number.ToString(),
                 };
 
-                int blueCount = CalculateNumberForCoords(otherCoords);
-
-                string text = blueCount.ToString();
-                if (column.tag == "Column Sequential")
+                if (clue.kind == Clue.Kind.Surround || clue.kind == Clue.Kind.Flower)
                 {
-                    text = "{" + text + "}";
+                    clue.sourceGO.transform.Find("Hex Number").GetComponent<TextMesh>().text = text;
                 }
-                else if (column.tag == "Column NOT Sequential")
+                else if (clue.kind == Clue.Kind.Column)
                 {
-                    text = "-" + text + "-";
+                    clue.sourceGO.GetComponent<TextMesh>().text = text;
                 }
-                column.GetComponent<TextMesh>().text = text;
             }
         }
     }

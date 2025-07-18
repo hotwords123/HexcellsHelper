@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,20 +5,6 @@ namespace HexcellsHelper
 {
     public class TrivialSolver : MonoBehaviour
     {
-        List<Clue> clues;
-
-        void OnEnable()
-        {
-            EventManager.LevelLoaded += OnLevelLoaded;
-            EventManager.LevelUnloaded += OnLevelUnloaded;
-        }
-
-        void OnDisable()
-        {
-            EventManager.LevelLoaded -= OnLevelLoaded;
-            EventManager.LevelUnloaded -= OnLevelUnloaded;
-        }
-
         void Update()
         {
             if (EventManager.IsLevelLoaded && !MapManager.IsCompleted && Input.GetKeyDown(KeyCode.Space))
@@ -34,26 +19,9 @@ namespace HexcellsHelper
             }
         }
 
-        void OnLevelLoaded()
-        {
-            clues = [];
-            clues.AddRange(CoordUtil.AllCoords()
-                .Select(coord => Clue.FromHex(MapManager.GridAt(coord)))
-                .Where(clue => clue != null));
-            clues.AddRange(MapManager.Columns
-                .Select(Clue.FromColumn)
-                .Where(clue => clue != null));
-            clues.Add(Clue.FromWholeLevel());
-        }
-
-        void OnLevelUnloaded()
-        {
-            clues = null;
-        }
-
         bool SolveTrivial()
         {
-            var visibleClues = clues.Where(c => c.IsSourceVisible());
+            var visibleClues = MapManager.Clues.Where(c => c.IsSourceVisible());
             var success = false;
 
             foreach (var clue in visibleClues)

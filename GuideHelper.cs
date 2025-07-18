@@ -30,8 +30,8 @@ namespace HexcellsHelper
         {
             foreach (var hexGO in MapManager.Hexes)
             {
-                if (hexGO.name == "Blue Hex (Flower)" &&
-                    !MapManager.IsHidden(CoordUtil.WorldToGrid(hexGO.transform.position)))
+                if (MapUtil.IsBlueHexFlower(hexGO) &&
+                    !MapManager.IsHidden(Coordinate.FromGameObject(hexGO)))
                 {
                     var flower = hexGO.GetComponent<BlueHexFlower>();
                     if (flower != null && !flower.playerHasMarkedComplete)

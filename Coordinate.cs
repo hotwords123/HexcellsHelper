@@ -6,30 +6,28 @@ namespace HexcellsHelper
 {
     public record struct Coordinate(int X, int Y)
     {
-        public static Coordinate operator +(Coordinate a, Coordinate b) =>
-            new(a.X + b.X, a.Y + b.Y);
-    }
-
-    public static class CoordUtil
-    {
         public const int Width = 33;
         public const int Height = 33;
 
-        public static bool IsValidCoord(int x, int y)
+        public readonly bool IsValid()
         {
-            return 0 <= x && x < Width && 0 <= y && y < Height;
-        }
-        public static bool IsValidCoord(Coordinate coord)
-        {
-            return IsValidCoord(coord.X, coord.Y);
+            return 0 <= X && X < Width && 0 <= Y && Y < Height;
         }
 
-        public static Coordinate WorldToGrid(Vector3 vec)
+        public static Coordinate operator +(Coordinate a, Coordinate b) =>
+            new(a.X + b.X, a.Y + b.Y);
+
+        public static Coordinate FromWorldPosition(Vector3 vec)
         {
             return new(
                 Mathf.RoundToInt(vec.x / 0.88f) + 15,
                 Mathf.RoundToInt(vec.y / 0.5f) + 15
             );
+        }
+
+        public static Coordinate FromGameObject(GameObject go)
+        {
+            return FromWorldPosition(go.transform.position);
         }
 
         public static IEnumerable<Coordinate> AllCoords()
@@ -63,36 +61,29 @@ namespace HexcellsHelper
             return offsets.Select(offset => coord + offset);
         }
 
-        public static IEnumerable<Coordinate> SurroundCoords(Coordinate coord)
+        public readonly IEnumerable<Coordinate> SurroundCoords()
         {
-            return OffsetCoords(coord, SurroundOffsets);
+            return OffsetCoords(this, SurroundOffsets);
         }
-        public static IEnumerable<Coordinate> FlowerCoords(Coordinate coord)
+        public readonly IEnumerable<Coordinate> FlowerCoords()
         {
-            return OffsetCoords(coord, FlowerOffsets);
+            return OffsetCoords(this, FlowerOffsets);
         }
 
-        public static IEnumerable<Coordinate> ColumnCoords(Coordinate coord, Coordinate direction)
+        public readonly IEnumerable<Coordinate> ColumnCoords(ColumnType columnType)
         {
-            coord += direction;
-            while (IsValidCoord(coord))
+            var direction = columnType switch
+            {
+                ColumnType.DiagonalLeft => new Coordinate(-1, -1),
+                ColumnType.DiagonalRight => new Coordinate(1, -1),
+                _ => new Coordinate(0, -2),
+            };
+            var coord = this + direction;
+            while (coord.IsValid())
             {
                 yield return coord;
                 coord += direction;
             }
-        }
-
-        public static IEnumerable<Coordinate> DiagonalLeftCoords(Coordinate coord)
-        {
-            return ColumnCoords(coord, new Coordinate(-1, -1));
-        }
-        public static IEnumerable<Coordinate> DiagonalRightCoords(Coordinate coord)
-        {
-            return ColumnCoords(coord, new Coordinate(1, -1));
-        }
-        public static IEnumerable<Coordinate> VerticalCoords(Coordinate coord)
-        {
-            return ColumnCoords(coord, new Coordinate(0, -2));
         }
     }
 }

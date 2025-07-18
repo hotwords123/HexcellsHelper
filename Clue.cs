@@ -33,48 +33,41 @@ namespace HexcellsHelper
 
         public static Clue FromHex(GameObject hexGO)
         {
-            if (hexGO == null)
+            return MapUtil.GetCellType(hexGO) switch
             {
-                return null;
-            }
-
-            return hexGO.tag == "Blue" ? FromBlueHex(hexGO) : FromBlackHex(hexGO);
+                CellType.Black => FromBlackHex(hexGO),
+                CellType.Blue => FromBlueHex(hexGO),
+                _ => null,
+            };
         }
 
         public static Clue FromBlackHex(GameObject hexGO)
         {
-            if (hexGO == null || hexGO.tag == "Clue Hex Blank")
+            if (hexGO == null || MapUtil.IsBlackHexBlank(hexGO))
             {
                 return null;
             }
 
-            var coord = CoordUtil.WorldToGrid(hexGO.transform.position);
             return new Clue
             {
                 sourceGO = hexGO,
-                coords = CoordUtil.SurroundCoords(coord).ToArray(),
+                coords = Coordinate.FromGameObject(hexGO).SurroundCoords().ToArray(),
                 kind = Kind.Surround,
-                modifier = hexGO.tag switch
-                {
-                    "Clue Hex (Sequential)" => Modifier.Consecutive,
-                    "Clue Hex (NOT Sequential)" => Modifier.NonConsecutive,
-                    _ => Modifier.None,
-                },
+                modifier = MapUtil.GetBlackHexModifier(hexGO),
             };
         }
 
         public static Clue FromBlueHex(GameObject hexGO)
         {
-            if (hexGO == null || hexGO.name != "Blue Hex (Flower)")
+            if (hexGO == null || !MapUtil.IsBlueHexFlower(hexGO))
             {
                 return null;
             }
 
-            var coord = CoordUtil.WorldToGrid(hexGO.transform.position);
             return new Clue
             {
                 sourceGO = hexGO,
-                coords = CoordUtil.FlowerCoords(coord).ToArray(),
+                coords = Coordinate.FromGameObject(hexGO).FlowerCoords().ToArray(),
                 kind = Kind.Flower,
                 modifier = Modifier.None,
             };
@@ -87,36 +80,24 @@ namespace HexcellsHelper
                 return null;
             }
 
-            var coord = CoordUtil.WorldToGrid(columnGO.transform.position);
-            var columnCoords = columnGO.name switch
-            {
-                "Column Number Diagonal Left" => CoordUtil.DiagonalLeftCoords(coord),
-                "Column Number Diagonal Right" => CoordUtil.DiagonalRightCoords(coord),
-                _ => CoordUtil.VerticalCoords(coord),
-            };
             return new Clue
             {
                 sourceGO = columnGO,
-                coords = columnCoords.Where(MapManager.IsNonEmpty).ToArray(),
+                coords = Coordinate.FromGameObject(columnGO)
+                    .ColumnCoords(MapUtil.GetColumnType(columnGO))
+                    .Where(MapManager.IsNonEmpty)
+                    .ToArray(),
                 kind = Kind.Column,
-                modifier = columnGO.tag switch
-                {
-                    "Column Sequential" => Modifier.Consecutive,
-                    "Column NOT Sequential" => Modifier.NonConsecutive,
-                    _ => Modifier.None,
-                }
+                modifier = MapUtil.GetColumnModifier(columnGO),
             };
         }
 
         public static Clue FromWholeLevel()
         {
-            var coords = MapManager.Hexes
-                .Select(hexGO => CoordUtil.WorldToGrid(hexGO.transform.position))
-                .ToArray();
             return new Clue
             {
                 sourceGO = null,
-                coords = coords,
+                coords = MapManager.Hexes.Select(Coordinate.FromGameObject).ToArray(),
                 kind = Kind.WholeLevel,
                 modifier = Modifier.None,
             };
@@ -130,7 +111,7 @@ namespace HexcellsHelper
 
             foreach (var coord in hiddenCoords)
             {
-                if (MapManager.GridAt(coord).tag == "Blue")
+                if (MapManager.CellTypeAt(coord) == CellType.Blue)
                 {
                     hiddenBlues++;
                 }
@@ -219,7 +200,7 @@ namespace HexcellsHelper
                     // Skip already revealed cells
                     if (!MapManager.IsHidden(coord))
                     {
-                        isBlue[index] = MapManager.GridAt(coord).tag == "Blue";
+                        isBlue[index] = MapManager.CellTypeAt(coord) == CellType.Blue;
                         Dfs(index + 1, remainingBlacks, remainingBlues);
                         return;
                     }
@@ -301,7 +282,7 @@ namespace HexcellsHelper
         {
             if (kind == Kind.Surround || kind == Kind.Flower)
             {
-                var coord = CoordUtil.WorldToGrid(sourceGO.transform.position);
+                var coord = Coordinate.FromGameObject(sourceGO);
                 return !MapManager.IsHidden(coord);
             }
             return true;

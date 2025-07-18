@@ -58,7 +58,7 @@ namespace HexcellsHelper
 
         void OnHexRevealed(HexBehaviour hexBehaviour)
         {
-            var coord = CoordUtil.WorldToGrid(hexBehaviour.transform.position);
+            var coord = Coordinate.FromGameObject(hexBehaviour.gameObject);
             AddAction(new ClickUndoAction(coord));
         }
 
