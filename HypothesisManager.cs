@@ -78,7 +78,7 @@ namespace HexcellsHelper
                     ToggleHypothesisMode();
                 }
 
-                if (Input.GetKeyDown(KeyCode.C))
+                if (IsHypothesisModeActive && Input.GetKeyDown(KeyCode.C))
                 {
                     ClearHypotheses();
                 }
