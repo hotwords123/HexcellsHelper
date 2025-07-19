@@ -58,8 +58,7 @@ namespace HexcellsHelper
 
         void OnHexRevealed(HexBehaviour hexBehaviour)
         {
-            var coord = Coordinate.FromGameObject(hexBehaviour.gameObject);
-            AddAction(new ClickUndoAction(coord));
+            AddAction(new ClickUndoAction(hexBehaviour.gameObject));
         }
 
         public void BeginGroup()

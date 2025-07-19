@@ -3,17 +3,26 @@ using UnityEngine;
 
 namespace HexcellsHelper
 {
-    public class ClickUndoAction(Coordinate coord) : IUndoableAction
+    public class ClickUndoAction(GameObject overlayHex) : IUndoableAction
     {
+        private readonly Coordinate coord = Coordinate.FromGameObject(overlayHex);
+        private readonly HypothesisState previousState =
+            overlayHex.GetComponent<HexHypothesis>()?.State ?? HypothesisState.None;
+
         public void Undo()
         {
             MapManager.SetHidden(coord);
+
+            var hexHypothesis = MapManager.GridOverlayAt(coord)?.GetComponent<HexHypothesis>();
+            if (hexHypothesis != null)
+            {
+                hexHypothesis.State = previousState;
+            }
         }
     }
 
     public class MarkFlowerAsCompleteUndoAction(BlueHexFlower flower) : IUndoableAction
     {
-        private readonly BlueHexFlower flower = flower;
         private readonly bool previousGuideState = FlowerGuideUtil.GetGuideIsOff(flower);
 
         public void Undo()
@@ -31,7 +40,6 @@ namespace HexcellsHelper
 
     public class MarkColumnAsCompleteUndoAction(ColumnNumber column) : IUndoableAction
     {
-        private readonly ColumnNumber column = column;
         private readonly bool previousGuideState = ColumnGuideUtil.GetRenderer(column).enabled;
 
         public void Undo()
@@ -70,11 +78,17 @@ namespace HexcellsHelper
 
     public class HexHypothesisUndoAction(HexHypothesis hexHypothesis, HypothesisState previousState) : IUndoableAction
     {
-        private readonly HexHypothesis hexHypothesis = hexHypothesis;
-        private readonly HypothesisState previousState = previousState;
+        private readonly Coordinate coord = Coordinate.FromGameObject(hexHypothesis.gameObject);
 
         public void Undo()
         {
+            var hexHypothesis = MapManager.GridOverlayAt(coord)?.GetComponent<HexHypothesis>();
+            if (hexHypothesis == null)
+            {
+                Debug.LogWarning($"HexHypothesisUndoAction: HexHypothesis at {coord} not found.");
+                return;
+            }
+
             if (!HypothesisManager.Instance.IsHypothesisModeActive)
             {
                 HypothesisManager.Instance.ToggleHypothesisMode();
