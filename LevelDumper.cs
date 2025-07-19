@@ -12,7 +12,9 @@ namespace HexcellsHelper
         {
             if (EventManager.IsLevelLoaded && Input.GetKeyDown(KeyCode.F2))
             {
-                string levelText = SerializeCurrentLevel();
+                // If Shift is held, copy the initial state instead of the current state
+                var isInitialState = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+                string levelText = SerializeCurrentLevel(isInitialState);
                 if (string.IsNullOrEmpty(levelText))
                 {
                     Debug.LogError("[LevelDumper] Failed to serialize the current level.");
@@ -28,7 +30,7 @@ namespace HexcellsHelper
             }
         }
 
-        string SerializeCurrentLevel()
+        string SerializeCurrentLevel(bool isInitialState)
         {
             char[,] grid = new char[Coordinate.Height, Coordinate.Width * 2];
 
@@ -57,8 +59,10 @@ namespace HexcellsHelper
                     info = MapUtil.IsBlueHexFlower(cell) ? '+' : '.';
                 }
 
-                if (!MapManager.IsHidden(coord))
+                if (cellType != CellType.Empty &&
+                    (isInitialState ? MapUtil.IsPreRevealed(cell) : !MapManager.IsHidden(coord)))
                 {
+                    // Revealed hexes are marked with uppercase letters
                     kind = char.ToUpper(kind);
                 }
 

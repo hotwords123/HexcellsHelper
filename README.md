@@ -87,7 +87,7 @@ bash scripts/build-patch.sh build
 
 The HexcellsHelper plugin provides the following functionalities in game:
 
-- **F2**: Copies the current level state to the clipboard in the [SixCells editor format](https://github.com/oprypin/sixcells?tab=readme-ov-file#level-file-structure).
+- **F2**: Copies the current level state to the clipboard in the [SixCells editor format](https://github.com/oprypin/sixcells?tab=readme-ov-file#level-file-structure). Shift held: copy initial state.
 - **Z**: Undoes the last action (left-click or right-click).
 - **T**: Toggles the display mode (whether the numbers on the cells represent the total number of blue cells or the remaining blue cells).
 - **Tab**: Temporarily switches the display mode while held down (reverts when released).

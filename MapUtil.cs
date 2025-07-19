@@ -19,6 +19,11 @@ namespace HexcellsHelper
             return hexGO.tag == "Blue" ? CellType.Blue : CellType.Black;
         }
 
+        public static bool IsPreRevealed(GameObject hexGO)
+        {
+            return hexGO.layer == LayerMask.NameToLayer("Pre-Revealed");
+        }
+
         public static bool IsBlackHexBlank(GameObject hexGO)
         {
             return hexGO.tag == "Clue Hex Blank";
