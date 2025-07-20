@@ -4,6 +4,18 @@ namespace HexcellsHelper
 {
     public static class MapUtil
     {
+        public static readonly int PreRevealedLayer = LayerMask.NameToLayer("Pre-Revealed");
+
+        public const string BlueTag = "Blue";
+        public const string BlackHexBlankTag = "Clue Hex Blank";
+        public const string ClueHexSequentialTag = "Clue Hex (Sequential)";
+        public const string ClueHexNonSequentialTag = "Clue Hex (NOT Sequential)";
+        public const string BlueHexFlowerName = "Blue Hex (Flower)";
+        public const string ColumnNumberDiagonalLeftName = "Column Number Diagonal Left";
+        public const string ColumnNumberDiagonalRightName = "Column Number Diagonal Right";
+        public const string ColumnConsecutiveTag = "Column Sequential";
+        public const string ColumnNonConsecutiveTag = "Column NOT Sequential";
+
         public static string NormalizeName(string name)
         {
             return name.Replace("(Clone)", "").Trim();
@@ -16,40 +28,40 @@ namespace HexcellsHelper
                 return CellType.Empty;
             }
 
-            return hexGO.tag == "Blue" ? CellType.Blue : CellType.Black;
+            return hexGO.tag == BlueTag ? CellType.Blue : CellType.Black;
         }
 
         public static bool IsPreRevealed(GameObject hexGO)
         {
-            return hexGO.layer == LayerMask.NameToLayer("Pre-Revealed");
+            return hexGO.layer == PreRevealedLayer;
         }
 
         public static bool IsBlackHexBlank(GameObject hexGO)
         {
-            return hexGO.tag == "Clue Hex Blank";
+            return hexGO.tag == BlackHexBlankTag;
         }
 
         public static Clue.Modifier GetBlackHexModifier(GameObject hexGO)
         {
             return hexGO.tag switch
             {
-                "Clue Hex (Sequential)" => Clue.Modifier.Consecutive,
-                "Clue Hex (NOT Sequential)" => Clue.Modifier.NonConsecutive,
+                ClueHexSequentialTag => Clue.Modifier.Consecutive,
+                ClueHexNonSequentialTag => Clue.Modifier.NonConsecutive,
                 _ => Clue.Modifier.None,
             };
         }
 
         public static bool IsBlueHexFlower(GameObject hexGO)
         {
-            return NormalizeName(hexGO.name) == "Blue Hex (Flower)";
+            return NormalizeName(hexGO.name) == BlueHexFlowerName;
         }
 
         public static ColumnType GetColumnType(GameObject columnGO)
         {
             return NormalizeName(columnGO.name) switch
             {
-                "Column Number Diagonal Left" => ColumnType.DiagonalLeft,
-                "Column Number Diagonal Right" => ColumnType.DiagonalRight,
+                ColumnNumberDiagonalLeftName => ColumnType.DiagonalLeft,
+                ColumnNumberDiagonalRightName => ColumnType.DiagonalRight,
                 _ => ColumnType.Vertical,
             };
         }
@@ -58,8 +70,8 @@ namespace HexcellsHelper
         {
             return columnGO.tag switch
             {
-                "Column Sequential" => Clue.Modifier.Consecutive,
-                "Column NOT Sequential" => Clue.Modifier.NonConsecutive,
+                ColumnConsecutiveTag => Clue.Modifier.Consecutive,
+                ColumnNonConsecutiveTag => Clue.Modifier.NonConsecutive,
                 _ => Clue.Modifier.None,
             };
         }
