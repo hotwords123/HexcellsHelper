@@ -8,7 +8,15 @@ namespace HexcellsHelper
     {
         public static DisplayModeManager Instance { get; private set; }
 
-        bool countRemainingOnly = false;
+        public bool CountRemainingOnly
+        {
+            get => ModOptionsManager.Instance.Options.countRemainingOnly;
+            private set
+            {
+                ModOptionsManager.Instance.Options.countRemainingOnly = value;
+                ModOptionsManager.Instance.SaveOptions();
+            }
+        }
 
         void Awake()
         {
@@ -57,10 +65,10 @@ namespace HexcellsHelper
 
         void ToggleDisplayMode()
         {
-            countRemainingOnly = !countRemainingOnly;
+            CountRemainingOnly = !CountRemainingOnly;
             UpdateHexNumbers();
 
-            if (countRemainingOnly)
+            if (CountRemainingOnly)
             {
                 GameObjectUtil.GetMusicDirector().PlayNoteA(0.0f);
             }
@@ -81,16 +89,10 @@ namespace HexcellsHelper
             UpdateHexNumbers();
         }
 
-        int CalculateNumberForCoords(IEnumerable<Coordinate> coords)
-        {
-            return coords.Count(coord =>
-                MapManager.CellTypeAt(coord) == CellType.Blue &&
-                (!countRemainingOnly || MapManager.IsHidden(coord))
-            );
-        }
-
         public void UpdateHexNumbers()
         {
+            var countRemainingOnly = CountRemainingOnly;
+
             foreach (var clue in MapManager.Clues)
             {
                 if (clue.sourceGO == null)
@@ -98,7 +100,10 @@ namespace HexcellsHelper
                     continue;
                 }
 
-                var number = CalculateNumberForCoords(clue.coords);
+                var number = clue.coords.Count(coord =>
+                    MapManager.CellTypeAt(coord) == CellType.Blue &&
+                    (!countRemainingOnly || MapManager.IsHidden(coord))
+                );
                 var text = clue.modifier switch
                 {
                     Clue.Modifier.Consecutive => "{" + number + "}",

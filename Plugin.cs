@@ -16,6 +16,9 @@ namespace HexcellsHelper
     public class Plugin : BaseUnityPlugin
 #endif
     {
+        public static readonly string SaveDir = Path.Combine(Application.dataPath,
+            Application.platform == RuntimePlatform.OSXPlayer ? "../../saves" : "../saves");
+
 #if ASM_PATCH
         public static readonly string BaseDir =
             Path.Combine(Application.dataPath, "HexcellsHelper");
@@ -44,6 +47,7 @@ namespace HexcellsHelper
             managerObject.AddComponent<TrivialSolver>();
             managerObject.AddComponent<HypothesisManager>();
             managerObject.AddComponent<GuideHelper>();
+            managerObject.AddComponent<ModOptionsManager>();
 
             Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
