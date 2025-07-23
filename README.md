@@ -32,9 +32,9 @@ This method uses [BepInEx](https://github.com/BepInEx/BepInEx) for dynamic injec
 2. **Build the plugin**
    - Run the following command in the root directory of the project:
    ```bash
-   dotnet build -c Release -v d
+   dotnet publish -c Release
    ```
-   - After building, the generated DLL file will be automatically copied to the `plugins` directory of BepInEx.
+   - After publishing, the generated DLL file will be automatically copied to the `plugins` directory of BepInEx.
 
 3. **Launch the game**
    - Start the game to load the plugin.

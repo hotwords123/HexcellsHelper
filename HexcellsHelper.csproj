@@ -8,40 +8,32 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <GameDirectory>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\game-directory.txt').Trim())</GameDirectory>
+    <PublishDir>$(GameDirectory)\BepInEx\plugins\HexcellsHelper</PublishDir>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>$(GameDirectory)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="0Harmony">
       <HintPath>$(GameDirectory)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 
-  <Target Name="CopyPlugin" AfterTargets="Build">
-    <PropertyGroup>
-      <PluginOutputDir>$(GameDirectory)\BepInEx\plugins\HexcellsHelper</PluginOutputDir>
-    </PropertyGroup>
-
-    <Copy SourceFiles="$(TargetPath)"
-      DestinationFolder="$(PluginOutputDir)" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
-      DestinationFolder="$(PluginOutputDir)"
-      Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
-
-    <ItemGroup>
-      <AssetFiles Include="Assets\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(AssetFiles)"
-      DestinationFiles="@(AssetFiles->'$(PluginOutputDir)\Assets\%(RecursiveDir)%(Filename)%(Extension)')" />
-
-    <Message Importance="high" Text="Plugin copied to $(PluginOutputDir)" />
-  </Target>
+  <ItemGroup>
+    <Content Include="Assets\**\*.*">
+      <!-- <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> -->
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
