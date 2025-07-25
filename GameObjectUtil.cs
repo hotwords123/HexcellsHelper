@@ -17,7 +17,17 @@ namespace HexcellsHelper
 
         public static OptionsManager GetOptionsManager()
         {
-            return GameObject.Find("Game Manager(Clone)").GetComponent<OptionsManager>();
+            return GameObject.Find("Game Manager(Clone)")?.GetComponent<OptionsManager>();
+        }
+
+        public static CustomLevelManager GetCustomLevelManager()
+        {
+            return GameObject.Find("Custom Level Manager(Clone)")?.GetComponent<CustomLevelManager>();
+        }
+
+        public static GameObject GetMainCamera()
+        {
+            return GameObject.Find("Main Camera");
         }
 
         public static GameObject GetHexGrid()

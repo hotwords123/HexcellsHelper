@@ -16,6 +16,14 @@
       <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="TextMeshPro-5.6-Runtime">
+      <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\TextMeshPro-5.6-Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(GameDirectory)\Hexcells Infinite_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
