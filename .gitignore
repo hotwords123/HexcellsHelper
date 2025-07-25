@@ -61,3 +61,6 @@ nunit-*.xml
 
 # Configuration files
 game-directory.txt
+
+# Game libraries
+[Ll]ib/

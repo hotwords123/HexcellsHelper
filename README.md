@@ -29,14 +29,18 @@ This method uses [BepInEx](https://github.com/BepInEx/BepInEx) for dynamic injec
    - Extract the downloaded files into the root directory of your game. This should create a `BepInEx` folder alongside the game executable.
    - Additionally, ensure that the `doorstop_config.ini` and `winhttp.dll` files are also extracted into the root directory of your game. These files are required for BepInEx to function properly.
 
-2. **Build the plugin**
+2. **Copy Reference Assemblies**
+   - Use the provided script `python scripts/copy-dlls.py` to copy the necessary game DLL files as reference assemblies.
+   - Alternatively, you can manually copy the required DLL files from the game directory to the `lib` folder in the project root.
+
+3. **Build the plugin**
    - Run the following command in the root directory of the project:
    ```bash
    dotnet publish -c Release
    ```
    - After publishing, the generated DLL file will be automatically copied to the `plugins` directory of BepInEx.
 
-3. **Launch the game**
+4. **Launch the game**
    - Start the game to load the plugin.
 
 ### Method 2: Static Injection via Assembly-CSharp Patch

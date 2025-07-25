@@ -12,7 +12,7 @@ namespace HexcellsHelper
 #if ASM_PATCH
     public static class Plugin
 #else
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
 #endif
     {
@@ -28,10 +28,12 @@ namespace HexcellsHelper
 
         void Awake()
         {
-            var harmony = new Harmony(PluginInfo.PLUGIN_GUID);
+            var harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
 
             Init(BepInEx.Bootstrap.Chainloader.ManagerObject);
+
+            Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
         }
 #endif
 
@@ -48,8 +50,6 @@ namespace HexcellsHelper
             managerObject.AddComponent<HypothesisManager>();
             managerObject.AddComponent<GuideHelper>();
             managerObject.AddComponent<LevelGenHistoryScreen>();
-
-            Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
     }
 }
