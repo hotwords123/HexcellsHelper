@@ -10,11 +10,11 @@ namespace HexcellsHelper
 
         public bool CountRemainingOnly
         {
-            get => ModOptionsManager.Instance.Options.countRemainingOnly;
+            get => ModOptionsManager.Options.countRemainingOnly;
             private set
             {
-                ModOptionsManager.Instance.Options.countRemainingOnly = value;
-                ModOptionsManager.Instance.SaveOptions();
+                ModOptionsManager.Options.countRemainingOnly = value;
+                ModOptionsManager.SaveOptions();
             }
         }
 

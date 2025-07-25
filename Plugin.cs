@@ -47,7 +47,6 @@ namespace HexcellsHelper
             managerObject.AddComponent<TrivialSolver>();
             managerObject.AddComponent<HypothesisManager>();
             managerObject.AddComponent<GuideHelper>();
-            managerObject.AddComponent<ModOptionsManager>();
             managerObject.AddComponent<LevelGenHistoryScreen>();
 
             Debug.Log($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");

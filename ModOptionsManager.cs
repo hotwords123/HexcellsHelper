@@ -10,29 +10,18 @@ namespace HexcellsHelper
         public bool countRemainingOnly = false;
     }
 
-    public class ModOptionsManager : MonoBehaviour
+    public static class ModOptionsManager
     {
-        public static ModOptionsManager Instance { get; private set; }
+        public static ModOptions Options { get; private set; }
 
-        public ModOptions Options { get; private set; }
+        readonly static string savePath = Path.Combine(Plugin.SaveDir, "modoptions.json");
 
-        private string savePath;
-
-        void Awake()
+        static ModOptionsManager()
         {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            savePath = Path.Combine(Plugin.SaveDir, "modoptions.json");
             LoadOptions();
         }
 
-        public void LoadOptions()
+        public static void LoadOptions()
         {
             if (!File.Exists(savePath))
             {
@@ -44,7 +33,7 @@ namespace HexcellsHelper
             Options = JsonUtility.FromJson<ModOptions>(json);
         }
 
-        public void SaveOptions()
+        public static void SaveOptions()
         {
             var json = JsonUtility.ToJson(Options, true);
             File.WriteAllText(savePath, json);
