@@ -56,6 +56,25 @@ index 76bebbe..d908836 100644
  		}
  		else
  		{
+diff --git a/LevelCompleteScriptLevelGen.cs b/LevelCompleteScriptLevelGen.cs
+index ad37b60..b1f6b33 100644
+--- a/LevelCompleteScriptLevelGen.cs
++++ b/LevelCompleteScriptLevelGen.cs
+@@ -66,6 +66,14 @@ public class LevelCompleteScriptLevelGen : MonoBehaviour
+ 		{
+ 			GameObject.Find("Music Director(Clone)").GetComponent<MusicDirector>().PlayPuzzleComplete();
+ 		}
++		HexcellsHelper.LevelGenHistoryManager.AddEntry(new HexcellsHelper.LevelGenHistoryEntry
++		{
++			timestamp = System.DateTimeOffset.Now.ToString("o"),
++			difficulty = HexcellsHelper.GameObjectUtil.GetOptionsManager().currentOptions.levelGenHardModeActive ? "hard" : "easy",
++			seed = HexcellsHelper.GameObjectUtil.GetGameManager().seedNumber,
++			mistakes = mistakes,
++			timeTaken = timer,
++		});
+ 	}
+ 
+ 	private void SetupMenu(int mistakes)
 diff --git a/LevelGenerator.cs b/LevelGenerator.cs
 index 947f484..d18867a 100644
 --- a/LevelGenerator.cs
@@ -68,6 +87,23 @@ index 947f484..d18867a 100644
  	}
  
  	private void GenerateRandomSeedNumber()
+diff --git a/MenuLogic.cs b/MenuLogic.cs
+index 8b35291..d42ef13 100644
+--- a/MenuLogic.cs
++++ b/MenuLogic.cs
+@@ -121,6 +121,12 @@ public class MenuLogic : MonoBehaviour
+ 	{
+ 		if (Input.GetKeyDown(KeyCode.Escape))
+ 		{
++			var historyScreen = HexcellsHelper.LevelGenHistoryScreen.Instance;
++			if (historyScreen != null && historyScreen.IsScreenActive)
++			{
++				historyScreen.ExitScreen();
++				return;
++			}
+ 			if (mainCamera.transform.position.y < -20f)
+ 			{
+ 				gameManagerScript.GetComponent<OptionsManager>().SaveToJSONFile();
 diff --git a/OldLevelGenerator.cs b/OldLevelGenerator.cs
 index ed77ecc..0c9deaf 100644
 --- a/OldLevelGenerator.cs
