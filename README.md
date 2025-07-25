@@ -96,3 +96,7 @@ The HexcellsHelper plugin provides the following functionalities in game:
 - **C**: Clears all hypothesis marks from the current level.
 - **G**: Toggles column guides for all column numbers that are not marked as complete.
 - **Shift + G**: Toggles flower guides for all blue hex flowers that are not marked as complete.
+
+### Additional Features
+
+- **Puzzle History**: In the *Puzzle Generator* screen, you can click *"Puzzles Completed"* to view your puzzle completion history. Only puzzles completed after installing the plugin will be displayed.
