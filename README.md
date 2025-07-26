@@ -96,6 +96,9 @@ The HexcellsHelper plugin provides the following functionalities in game:
 - **T**: Toggles the display mode (whether the numbers on the cells represent the total number of blue cells or the remaining blue cells).
 - **Tab**: Temporarily switches the display mode while held down (reverts when released).
 - **Space**: Invokes the trivial solver to resolve simple cases automatically.
+  - Default: Solves based on a single clue (number) at a time.
+  - If **Shift** is held down, solves based on all currently visible clues.
+  - If **Ctrl** is held down, recursively solves until no further progress can be made.
 - **H**: Toggles hypothesis mode on and off. In hypothesis mode, you can mark cells as hypothetical blue or black by left-clicking or right-clicking them (depending on the *"Swap Mouse Buttons"* setting). To remove a hypothesis mark, right-click the cell again.
 - **C**: Clears all hypothesis marks from the current level.
 - **G**: Toggles column guides for all column numbers that are not marked as complete.
