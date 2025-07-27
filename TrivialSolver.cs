@@ -68,7 +68,11 @@ namespace HexcellsHelper
                     break;
 
                 case SolveMode.All:
-                    success = GetVisibleClues().Count(TrySolveClue) > 0;
+                    var visibleClues = GetVisibleClues();
+                    while (visibleClues.Count(TrySolveClue) > 0)
+                    {
+                        success = true;
+                    }
                     break;
 
                 case SolveMode.Recursive:
