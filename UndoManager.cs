@@ -6,6 +6,9 @@ namespace HexcellsHelper
 {
     public interface IUndoableAction
     {
+        // Whether the action modifies the map
+        bool IsModified { get; }
+
         void Undo();
     }
 
@@ -33,7 +36,8 @@ namespace HexcellsHelper
         {
             if (EventManager.IsLevelLoaded && !MapManager.IsCompleted && Input.GetKeyDown(KeyCode.Z))
             {
-                UndoLastAction();
+                bool forceModification = !HypothesisManager.Instance.IsHypothesisModeActive;
+                UndoLastAction(forceModification);
             }
         }
 
@@ -118,12 +122,16 @@ namespace HexcellsHelper
             }
         }
 
-        public void UndoLastAction()
+        public void UndoLastAction(bool forceModification = false)
         {
-            if (undoStack.Count > 0)
+            while (undoStack.Count > 0)
             {
                 var action = undoStack.Pop();
                 action.Undo();
+                if (!forceModification || action.IsModified)
+                {
+                    return;
+                }
             }
         }
     }

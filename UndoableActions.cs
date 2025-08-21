@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HexcellsHelper
@@ -8,6 +9,8 @@ namespace HexcellsHelper
         private readonly Coordinate coord = Coordinate.FromGameObject(overlayHex);
         private readonly HypothesisState previousState =
             overlayHex.GetComponent<HexHypothesis>()?.State ?? HypothesisState.None;
+
+        public bool IsModified => true;
 
         public void Undo()
         {
@@ -25,6 +28,8 @@ namespace HexcellsHelper
     {
         private readonly bool previousGuideState = FlowerGuideUtil.GetGuideIsOff(flower);
 
+        public bool IsModified => false;
+
         public void Undo()
         {
             if (flower.playerHasMarkedComplete)
@@ -41,6 +46,8 @@ namespace HexcellsHelper
     public class MarkColumnAsCompleteUndoAction(ColumnNumber column) : IUndoableAction
     {
         private readonly bool previousGuideState = ColumnGuideUtil.GetRenderer(column).enabled;
+
+        public bool IsModified => false;
 
         public void Undo()
         {
@@ -62,6 +69,8 @@ namespace HexcellsHelper
 
         public bool IsEmpty => actions.Count == 0;
 
+        public bool IsModified => actions.Any(action => action.IsModified);
+
         public void Undo()
         {
             foreach (var action in actions)
@@ -80,6 +89,8 @@ namespace HexcellsHelper
     {
         private readonly Coordinate coord = Coordinate.FromGameObject(hexHypothesis.gameObject);
 
+        public bool IsModified => false;
+
         public void Undo()
         {
             var hexHypothesis = MapManager.GridOverlayAt(coord)?.GetComponent<HexHypothesis>();
@@ -89,15 +100,13 @@ namespace HexcellsHelper
                 return;
             }
 
-            if (!HypothesisManager.Instance.IsHypothesisModeActive)
-            {
-                HypothesisManager.Instance.ToggleHypothesisMode();
-            }
-
             hexHypothesis.State = previousState;
 
-            GameObjectUtil.GetMusicDirector().PlayMouseOverSound();
-            iTween.ShakePosition(hexHypothesis.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+            if (HypothesisManager.Instance.IsHypothesisModeActive)
+            {
+                GameObjectUtil.GetMusicDirector().PlayMouseOverSound();
+                iTween.ShakePosition(hexHypothesis.gameObject, new Vector3(0.1f, 0.1f, 0f), 0.3f);
+            }
         }
     }
 }
