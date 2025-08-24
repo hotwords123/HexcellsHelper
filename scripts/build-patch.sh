@@ -124,7 +124,7 @@ function restore() {
 
 function main() {
     if [ $# -lt 1 ]; then
-        echo "Usage: $0 <decompile|apply|generate|build> [work_dir]"
+        echo "Usage: $0 <decompile|apply|generate|build|restore> [work_dir]"
         exit 1
     fi
 
