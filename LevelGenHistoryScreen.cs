@@ -22,6 +22,8 @@ namespace HexcellsHelper
         Tween cameraTween;
 
         GameObject historyEntryPrefab;
+        Material completedLevelIcon;
+
         Transform entryParent;
         Transform endIndicator;
         Transform openerText;
@@ -127,7 +129,9 @@ namespace HexcellsHelper
 
         void InitializePrefab()
         {
-            historyEntryPrefab = Instantiate(GameObjectUtil.GetCustomLevelManager().redditLevelPrefab);
+            var customLevelManager = GameObjectUtil.GetCustomLevelManager();
+
+            historyEntryPrefab = Instantiate(customLevelManager.redditLevelPrefab);
             historyEntryPrefab.name = "History Entry";
             historyEntryPrefab.SetActive(false);
             DontDestroyOnLoad(historyEntryPrefab);
@@ -148,6 +152,8 @@ namespace HexcellsHelper
             DestroyImmediate(historyEntryPrefab.transform.Find("Comments").gameObject);
             DestroyImmediate(historyEntryPrefab.transform.Find("Hyperlink").gameObject);
             DestroyImmediate(historyEntryPrefab.transform.Find("Save State Icon").gameObject);
+
+            completedLevelIcon = customLevelManager.completedLevelIconMat;
         }
 
         void InitializeUI()
@@ -232,7 +238,9 @@ namespace HexcellsHelper
 
         void RenderHistoryEntries()
         {
-            for (var i = 0; i < historyEntries.Count; i++)
+            var solvedPuzzleIds = new HashSet<string>();
+
+            for (var i = historyEntries.Count - 1; i >= 0; i--)
             {
                 var entry = historyEntries[i];
 
@@ -240,6 +248,13 @@ namespace HexcellsHelper
                 entryGO.name = $"History Entry {i + 1}";
                 entryGO.transform.localPosition = new Vector3(-6.3f, 3.45f - i * 0.7f, 0.05f);
                 entryGO.SetActive(true);
+
+                var puzzleId = $"{entry.difficulty}-{entry.seed}";
+                var isNewlySolved = solvedPuzzleIds.Add(puzzleId);
+                if (isNewlySolved)
+                {
+                    entryGO.GetComponent<Renderer>().material = completedLevelIcon;
+                }
 
                 var item = entryGO.transform.Find("Background").GetComponent<LevelGenHistoryItem>();
                 item.entry = entry;
