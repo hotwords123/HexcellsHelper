@@ -1,5 +1,5 @@
 diff --git a/Assembly-CSharp.csproj b/Assembly-CSharp.csproj
-index 7aa9e25..8466fd6 100644
+index 15ee995..9080453 100644
 --- a/Assembly-CSharp.csproj
 +++ b/Assembly-CSharp.csproj
 @@ -5,8 +5,9 @@
@@ -116,6 +116,46 @@ index ed77ecc..0c9deaf 100644
  	}
  
  	private void GenerateRandomSeedNumber()
+diff --git a/ScrollBar.cs b/ScrollBar.cs
+index 0394d97..a4ac38b 100644
+--- a/ScrollBar.cs
++++ b/ScrollBar.cs
+@@ -66,19 +66,19 @@ public class ScrollBar : MonoBehaviour
+ 		}
+ 		if (Input.mouseScrollDelta.y >= 0.1f)
+ 		{
+-			scrollPositionTarget = Mathf.Clamp01(scrollPosition + 15f / (float)numberOfLevelsInList);
++			scrollPositionTarget = Mathf.Clamp01(scrollPosition + CalculateScrollDelta());
+ 		}
+ 		if (Input.mouseScrollDelta.y <= -0.1f)
+ 		{
+-			scrollPositionTarget = Mathf.Clamp01(scrollPosition - 15f / (float)numberOfLevelsInList);
++			scrollPositionTarget = Mathf.Clamp01(scrollPosition - CalculateScrollDelta());
+ 		}
+ 		if (Input.GetKeyDown(KeyCode.DownArrow))
+ 		{
+-			scrollPositionTarget = Mathf.Clamp01(scrollPosition - 15f / (float)numberOfLevelsInList);
++			scrollPositionTarget = Mathf.Clamp01(scrollPosition - CalculateScrollDelta());
+ 		}
+ 		if (Input.GetKeyDown(KeyCode.UpArrow))
+ 		{
+-			scrollPositionTarget = Mathf.Clamp01(scrollPosition + 15f / (float)numberOfLevelsInList);
++			scrollPositionTarget = Mathf.Clamp01(scrollPosition + CalculateScrollDelta());
+ 		}
+ 		if (greyScale != greyscaleTarget)
+ 		{
+@@ -100,6 +100,11 @@ public class ScrollBar : MonoBehaviour
+ 		}
+ 	}
+ 
++	private float CalculateScrollDelta()
++	{
++		return 11f / Mathf.Max(11, numberOfLevelsInList - 10);
++	}
++
+ 	public void UpdateNumberOfLevelsInList(int newListSize)
+ 	{
+ 		numberOfLevelsInList = newListSize;
 diff --git a/.gitignore b/.gitignore
 new file mode 100644
 index 0000000..ce1227d
